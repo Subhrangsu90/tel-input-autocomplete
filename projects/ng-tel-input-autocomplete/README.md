@@ -53,7 +53,7 @@ import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomple
 
 @Component({
   selector: 'app-contact-form',
-  standalone: true,
+
   imports: [ReactiveFormsModule, NgTelInputAutocomplete],
   template: `
     <label for="work-phone">Work phone</label>

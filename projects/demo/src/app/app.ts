@@ -89,7 +89,7 @@ const MOCK_CONTACTS: PhoneSuggestion[] = [
 
 @Component({
   selector: 'app-root',
-  standalone: true,
+
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgTelInputAutocomplete],
   templateUrl: './app.html',
   styleUrl: './app.css',

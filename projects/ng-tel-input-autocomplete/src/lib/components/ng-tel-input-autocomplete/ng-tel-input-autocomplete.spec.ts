@@ -6,7 +6,6 @@ import { provideNgTelInputAutocomplete } from '../../config/ng-tel-input-autocom
 import { PhoneInputValue, PhoneNumberValue } from '../../models/ng-tel-input-autocomplete.types';
 
 @Component({
-  standalone: true,
   imports: [FormsModule, NgTelInputAutocomplete],
   template: `
     <label for="template-phone">Phone</label>
@@ -23,7 +22,6 @@ class TemplateDrivenHost {
 }
 
 @Component({
-  standalone: true,
   imports: [ReactiveFormsModule, NgTelInputAutocomplete],
   template: `
     <label for="reactive-phone">Phone</label>
@@ -39,7 +37,6 @@ class ReactiveFormsHost {
 }
 
 @Component({
-  standalone: true,
   imports: [NgTelInputAutocomplete],
   template: `
     <ng-template #selected let-country>

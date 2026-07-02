@@ -66,7 +66,7 @@ type DropdownItem = Country | PhoneSuggestion;
 
 @Component({
   selector: 'ng-tel-input-autocomplete',
-  standalone: true,
+
   imports: [OverlayModule, NgClass, NgStyle, NgTemplateOutlet, NgTelInputDropdown, NgTelInputIcon],
   templateUrl: './ng-tel-input-autocomplete.html',
   host: {

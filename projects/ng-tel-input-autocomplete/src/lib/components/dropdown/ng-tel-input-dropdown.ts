@@ -30,7 +30,7 @@ type DropdownItem = Country | PhoneSuggestion;
 
 @Component({
   selector: 'ng-tel-input-dropdown',
-  standalone: true,
+
   imports: [NgClass, NgStyle, NgTemplateOutlet, NgTelInputIcon],
   templateUrl: './ng-tel-input-dropdown.html',
   host: {
