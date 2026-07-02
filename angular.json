@@ -7,20 +7,20 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "ng-tel-autocomplete": {
+    "ng-tel-input-autocomplete": {
       "projectType": "library",
-      "root": "projects/ng-tel-autocomplete",
-      "sourceRoot": "projects/ng-tel-autocomplete/src",
+      "root": "projects/ng-tel-input-autocomplete",
+      "sourceRoot": "projects/ng-tel-input-autocomplete/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
-              "tsConfig": "projects/ng-tel-autocomplete/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ng-tel-input-autocomplete/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/ng-tel-autocomplete/tsconfig.lib.json"
+              "tsConfig": "projects/ng-tel-input-autocomplete/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -28,7 +28,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ng-tel-autocomplete/tsconfig.spec.json"
+            "tsConfig": "projects/ng-tel-input-autocomplete/tsconfig.spec.json"
           }
         }
       }

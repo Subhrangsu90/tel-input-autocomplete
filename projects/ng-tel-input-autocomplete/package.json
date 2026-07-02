@@ -1,11 +1,14 @@
 {
-  "name": "ng-tel-autocomplete",
+  "name": "ng-tel-input-autocomplete",
   "version": "0.0.1",
   "peerDependencies": {
+    "@angular/cdk": "^21.2.0",
     "@angular/common": "^21.2.0",
     "@angular/core": "^21.2.0"
   },
   "dependencies": {
+    "google-libphonenumber": "^3.2.44",
+    "intl-tel-input": "^29.1.1",
     "tslib": "^2.3.0"
   },
   "sideEffects": false

@@ -8,8 +8,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "ng-tel-autocomplete": [
-        "./dist/ng-tel-autocomplete"
+      "ng-tel-input-autocomplete": [
+        "./dist/ng-tel-input-autocomplete"
       ]
     },
     "noFallthroughCasesInSwitch": true,
@@ -29,10 +29,10 @@
   "files": [],
   "references": [
     {
-      "path": "./projects/ng-tel-autocomplete/tsconfig.lib.json"
+      "path": "./projects/ng-tel-input-autocomplete/tsconfig.lib.json"
     },
     {
-      "path": "./projects/ng-tel-autocomplete/tsconfig.spec.json"
+      "path": "./projects/ng-tel-input-autocomplete/tsconfig.spec.json"
     },
     {
       "path": "./projects/demo/tsconfig.app.json"

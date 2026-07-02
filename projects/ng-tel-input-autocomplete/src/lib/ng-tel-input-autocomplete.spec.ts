@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NgTelAutocomplete } from './ng-tel-autocomplete';
+import { NgTelInputAutocomplete } from './ng-tel-input-autocomplete';
 
-describe('NgTelAutocomplete', () => {
-  let component: NgTelAutocomplete;
-  let fixture: ComponentFixture<NgTelAutocomplete>;
+describe('NgTelInputAutocomplete', () => {
+  let component: NgTelInputAutocomplete;
+  let fixture: ComponentFixture<NgTelInputAutocomplete>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NgTelAutocomplete]
+      imports: [NgTelInputAutocomplete]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(NgTelAutocomplete);
+    fixture = TestBed.createComponent(NgTelInputAutocomplete);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

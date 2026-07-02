@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { NgTelAutocomplete } from 'ng-tel-autocomplete';
+import { NgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
 
 @Component({
   selector: 'app-root',
-  imports: [NgTelAutocomplete],
+  imports: [NgTelInputAutocomplete],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
