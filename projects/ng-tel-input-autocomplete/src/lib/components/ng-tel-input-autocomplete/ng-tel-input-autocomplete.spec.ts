@@ -1,8 +1,8 @@
 import { Component, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgTelInputAutocomplete } from './ng-tel-input-autocomplete';
-import { PhoneNumberValue } from './ng-tel-input-autocomplete.types';
+import { PhoneInputValue, PhoneNumberValue } from '../../models/ng-tel-input-autocomplete.types';
 
 @Component({
   standalone: true,
@@ -19,6 +19,22 @@ import { PhoneNumberValue } from './ng-tel-input-autocomplete.types';
 })
 class TemplateDrivenHost {
   phone = '+12025550143';
+}
+
+@Component({
+  standalone: true,
+  imports: [ReactiveFormsModule, NgTelInputAutocomplete],
+  template: `
+    <label for="reactive-phone">Phone</label>
+    <ng-tel-input-autocomplete
+      inputId="reactive-phone"
+      [formControl]="phone"
+      [suggestionsEnabled]="false"
+    />
+  `,
+})
+class ReactiveFormsHost {
+  readonly phone = new FormControl<PhoneInputValue>(null, { validators: [Validators.required] });
 }
 
 @Component({
@@ -316,6 +332,69 @@ describe('NgTelInputAutocomplete', () => {
     expect(overlayHide).toHaveBeenCalledWith({ type: 'countries' });
     expect(countrySelect).toHaveBeenCalledWith(expect.objectContaining({ country: component.countries()[1] }));
     expect(suggestionSelect).toHaveBeenCalledWith(expect.objectContaining({ suggestion: expect.objectContaining({ name: 'Asha' }) }));
+  });
+
+  it('should support reactive forms value writes, validation, touched state, and disabling', async () => {
+    const hostFixture = TestBed.createComponent(ReactiveFormsHost);
+    await hostFixture.whenStable();
+
+    const phoneControl = hostFixture.componentInstance.phone;
+    const input = hostFixture.nativeElement.querySelector('#reactive-phone') as HTMLInputElement;
+
+    expect(phoneControl.hasError('required')).toBe(true);
+    expect(input.required).toBe(false);
+
+    phoneControl.setValue('+12025550143');
+    await hostFixture.whenStable();
+
+    expect(input.value).toContain('202');
+    expect(phoneControl.valid).toBe(true);
+
+    input.value = '4155550134';
+    input.dispatchEvent(new Event('input'));
+    await hostFixture.whenStable();
+
+    expect(phoneControl.value).toBe('+14155550134');
+
+    input.dispatchEvent(new Event('blur'));
+    await hostFixture.whenStable();
+    expect(phoneControl.touched).toBe(true);
+
+    phoneControl.disable();
+    await hostFixture.whenStable();
+    expect(input.disabled).toBe(true);
+
+    phoneControl.enable();
+    await hostFixture.whenStable();
+    expect(input.disabled).toBe(false);
+
+    hostFixture.destroy();
+  });
+
+  it('should leave Angular required validation to the consuming form control', async () => {
+    const hostFixture = TestBed.createComponent(ReactiveFormsHost);
+    await hostFixture.whenStable();
+
+    const phoneControl = hostFixture.componentInstance.phone;
+    const input = hostFixture.nativeElement.querySelector('#reactive-phone') as HTMLInputElement;
+
+    expect(phoneControl.hasError('required')).toBe(true);
+    expect(input.required).toBe(false);
+
+    hostFixture.destroy();
+  });
+
+  it('should report invalid phone errors and allow validation to be disabled', async () => {
+    const control = new FormControl<PhoneInputValue>('123');
+
+    component.writeValue('123');
+    expect(component.validate(control)).toEqual({ invalidPhoneNumber: true });
+
+    fixture.componentRef.setInput('validationEnabled', false);
+    await fixture.whenStable();
+
+    expect(component.validate(control)).toBeNull();
+    expect(component.isValid()).toBe(true);
   });
 
   it('should support template-driven forms', async () => {

@@ -24,8 +24,8 @@ For the complete properties, emitters, templates, interfaces, keyboard behavior,
 
 ```ts
 import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { NgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomplete';
 
 @Component({
   selector: 'app-contact-form',
@@ -42,7 +42,9 @@ import { NgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
   `,
 })
 export class ContactForm {
-  readonly phone = new FormControl<string | null>(null);
+  readonly phone = new FormControl<PhoneInputValue>(null, {
+    validators: [Validators.required],
+  });
 }
 ```
 
@@ -100,6 +102,10 @@ interface PhoneNumberValue {
 
 Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validationEnabled]="false"` to disable the library validator.
 
+For typed forms, use `FormControl<PhoneInputValue>` when the control may emit strings, objects, or `null`. If your app fixes `outputFormat="string"`, `FormControl<string | null>` is also appropriate; with `outputFormat="object"`, use `FormControl<PhoneNumberValue | null>`.
+
+The `required` input only forwards the native `required` attribute. Use Angular `Validators.required` in reactive forms or the Angular `required` validator in template-driven forms when the form control itself must be invalid while empty.
+
 ## Inputs
 
 | Input | Type | Default | Purpose |
@@ -123,7 +129,7 @@ Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validatio
 | `inputSize` | `number \| null` | `null` | Visible input width in characters |
 | `readOnly` | `boolean` | `false` | Prevent user edits while allowing form writes |
 | `readonly` | `boolean` | `false` | Alias for `readOnly` |
-| `required` | `boolean` | `false` | Native required attribute |
+| `required` | `boolean` | `false` | Native required attribute; use Angular validators for form validity |
 | `spellcheck` | `boolean` | `false` | Native spellcheck attribute |
 | `disabled` | `boolean` | `false` | Disable without Angular Forms |
 | `invalid` | `boolean` | `false` | Force invalid visual and ARIA state |

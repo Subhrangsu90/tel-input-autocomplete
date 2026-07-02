@@ -1,4 +1,4 @@
-import { Country } from './ng-tel-input-autocomplete.types';
+import { Country } from '../models/ng-tel-input-autocomplete.types';
 
 export const COUNTRIES: Country[] = [
   { name: 'United States', code: 'US', dialCode: '+1', flag: '🇺🇸', format: '(###) ###-####', placeholder: '(201) 555-0123' },

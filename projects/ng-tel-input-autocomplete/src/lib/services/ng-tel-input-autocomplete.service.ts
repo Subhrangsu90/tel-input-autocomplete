@@ -7,8 +7,8 @@ import {
   CountrySearchResponse,
   Country,
   PhoneNumberValue
-} from './ng-tel-input-autocomplete.types';
-import { COUNTRIES } from './countries-data';
+} from '../models/ng-tel-input-autocomplete.types';
+import { COUNTRIES } from '../data/countries-data';
 
 @Injectable({
   providedIn: 'root'

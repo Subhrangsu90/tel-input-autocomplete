@@ -1,0 +1,171 @@
+<div
+  class="ngti-dropdown"
+  [ngClass]="panelClass()"
+  [ngStyle]="panelStyle()"
+  (keydown)="handleKeyDown($event)"
+>
+  @if (type() === 'countries') {
+    <div class="ngti-search">
+      <lib-tel-icon name="search" class="ngti-search-icon" aria-hidden="true" />
+      <input
+        #searchInput
+        type="search"
+        [id]="searchInputId"
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        placeholder="Search country or dial code"
+        aria-label="Search countries"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="true"
+        [attr.aria-controls]="listboxId"
+        [attr.aria-activedescendant]="activeOptionId"
+        autocomplete="off"
+      />
+      @if (searchQuery()) {
+        <button
+          type="button"
+          class="ngti-icon-button"
+          (click)="clearSearch()"
+          aria-label="Clear country search"
+        >
+          <lib-tel-icon name="close" aria-hidden="true" />
+        </button>
+      }
+    </div>
+  }
+
+  <div
+    #listContainer
+    class="ngti-listbox"
+    role="listbox"
+    [id]="listboxId"
+    [attr.aria-label]="type() === 'countries' ? 'Countries' : 'Phone suggestions'"
+    [attr.aria-busy]="loading()"
+    (scroll)="onScroll($event)"
+  >
+    @if (type() === 'countries') {
+      @for (country of countriesCast; track country.code; let index = $index) {
+        <button
+          type="button"
+          class="ngti-option"
+          role="option"
+          tabindex="-1"
+          [id]="countryOptionId(country)"
+          [class.ngti-is-active]="index === activeIndex()"
+          [class.ngti-is-selected]="country.code === selectedCountry()?.code"
+          [attr.aria-selected]="country.code === selectedCountry()?.code"
+          (click)="selectItem(country)"
+        >
+          @if (countryTemplate(); as template) {
+            <ng-container
+              [ngTemplateOutlet]="template"
+              [ngTemplateOutletContext]="{
+                $implicit: country,
+                country,
+                selected: country.code === selectedCountry()?.code
+              }"
+            />
+          } @else {
+            <span class="ngti-option-leading">
+              @if (flagMode() === 'image') {
+                <img class="ngti-flag-image" [src]="getFlagUrl(country.code)" alt="" referrerpolicy="no-referrer" />
+              } @else {
+                <span class="ngti-flag-emoji" aria-hidden="true">{{ country.flag }}</span>
+              }
+              <span class="ngti-country-label">
+                <span class="ngti-primary" [innerHTML]="getHighlightedText(country.name, searchQuery())"></span>
+                <span class="ngti-secondary" [innerHTML]="getHighlightedText(country.dialCode, searchQuery())"></span>
+              </span>
+            </span>
+            @if (country.code === selectedCountry()?.code) {
+              <lib-tel-icon name="check" class="ngti-selected-icon" aria-hidden="true" />
+            }
+          }
+        </button>
+      } @empty {
+        <div class="ngti-empty" role="status">
+          @if (emptyTemplate(); as template) {
+            <ng-container
+              [ngTemplateOutlet]="template"
+              [ngTemplateOutletContext]="{ $implicit: 'countries', type: 'countries' }"
+            />
+          } @else {
+            No countries found
+          }
+        </div>
+      }
+    } @else {
+      @for (suggestion of suggestionsCast; track suggestion.phoneNumber; let index = $index) {
+        <button
+          type="button"
+          class="ngti-option ngti-suggestion"
+          role="option"
+          tabindex="-1"
+          [id]="suggestionOptionId(index)"
+          [class.ngti-is-active]="index === activeIndex()"
+          [attr.aria-selected]="index === activeIndex()"
+          (click)="selectItem(suggestion)"
+        >
+          @if (suggestionTemplate(); as template) {
+            <ng-container
+              [ngTemplateOutlet]="template"
+              [ngTemplateOutletContext]="{
+                $implicit: suggestion,
+                suggestion,
+                index,
+                active: index === activeIndex()
+              }"
+            />
+          } @else {
+            <span class="ngti-option-leading">
+              <span class="ngti-avatar" aria-hidden="true">{{ (suggestion.name || 'UN').substring(0, 2).toUpperCase() }}</span>
+              <span class="ngti-suggestion-copy">
+                <span class="ngti-primary" [innerHTML]="getHighlightedText(suggestion.name || 'Unknown contact', searchQuery())"></span>
+                <span class="ngti-secondary" [innerHTML]="getHighlightedText(suggestion.phoneNumber, searchQuery())"></span>
+                @if (suggestion.subtitle) {
+                  <span class="ngti-subtitle" [innerHTML]="getHighlightedText(suggestion.subtitle, searchQuery())"></span>
+                }
+              </span>
+            </span>
+            @if (suggestion.countryCode) {
+              <span class="ngti-country-badge">
+                @if (flagMode() === 'image') {
+                  <img class="ngti-flag-image ngti-size-small" [src]="getFlagUrl(suggestion.countryCode)" alt="" referrerpolicy="no-referrer" />
+                } @else {
+                  <span aria-hidden="true">{{ flagEmoji(suggestion.countryCode) }}</span>
+                }
+                {{ suggestion.countryCode.toUpperCase() }}
+              </span>
+            }
+          }
+        </button>
+      } @empty {
+        <div class="ngti-empty" role="status">
+          @if (emptyTemplate(); as template) {
+            <ng-container
+              [ngTemplateOutlet]="template"
+              [ngTemplateOutletContext]="{ $implicit: 'suggestions', type: 'suggestions' }"
+            />
+          } @else {
+            No phone suggestions found
+          }
+        </div>
+      }
+    }
+
+    @if (loading()) {
+      <div class="ngti-loading" role="status" aria-live="polite">
+        @if (loadingTemplate(); as template) {
+          <ng-container
+            [ngTemplateOutlet]="template"
+            [ngTemplateOutletContext]="{ $implicit: type(), type: type() }"
+          />
+        } @else {
+          <span class="ngti-spinner" aria-hidden="true"></span>
+          Loading more...
+        }
+      </div>
+    }
+  </div>
+</div>

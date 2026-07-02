@@ -53,6 +53,11 @@
                 [suggestionsExhausted]="suggestionsExhausted()"
                 (suggestionSearch)="onQueryChange($event)"
                 (loadMoreSuggestions)="onLoadMore()"
+                size="small"
+                [invalid]="
+                  testForm.controls.phoneAutocomplete.invalid &&
+                  (testForm.controls.phoneAutocomplete.dirty || testForm.controls.phoneAutocomplete.touched)
+                "
               />
 
               <!-- Error Messages for Autocomplete Input -->
@@ -330,3 +335,4 @@
     Built for ChaiCode Libraries Monorepo Workspace. &copy; 2026.
   </div>
 </div>
+

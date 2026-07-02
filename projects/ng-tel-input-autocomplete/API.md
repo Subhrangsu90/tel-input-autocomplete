@@ -33,7 +33,7 @@ All component properties are signal-based Angular inputs.
 | `inputSize` | `number \| null` | `null` | Native size attribute controlling the visible input width in characters. |
 | `readOnly` | `boolean` | `false` | Makes the input readonly and prevents country, suggestion, and clear interactions. Programmatic form writes still work. |
 | `readonly` | `boolean` | `false` | Alias for `readOnly`, useful when matching native input or PrimeNG-style naming. |
-| `required` | `boolean` | `false` | Native required attribute forwarded to the telephone input. |
+| `required` | `boolean` | `false` | Native required attribute forwarded to the telephone input. Use Angular `Validators.required` / `required` validator for form-control validation. |
 | `spellcheck` | `boolean` | `false` | Native spellcheck attribute forwarded to the telephone input. |
 | `disabled` | `boolean` | `false` | Disables the input and country trigger outside Angular forms. CVA disabled state is also respected. |
 | `invalid` | `boolean` | `false` | Forces invalid visual and ARIA state from external validation. |
@@ -155,7 +155,15 @@ Pass class or style inputs when an application needs to adjust the rendered part
 `NgTelInputClassValue` accepts the same shapes as `NgClass`: string, string array, `Set<string>`, or object map. `NgTelInputStyleValue` is an object map compatible with `NgStyle`.
 ### Forms and validation
 
-The component implements `ControlValueAccessor` and `Validator`, so it works with Reactive Forms and template-driven forms.
+The component implements `ControlValueAccessor` and `Validator`, so it works with Reactive Forms and template-driven forms. Use `FormControl<PhoneInputValue>` for the widest typed control, `FormControl<string | null>` when `outputFormat="string"`, or `FormControl<PhoneNumberValue | null>` when `outputFormat="object"`.
+
+```ts
+readonly phone = new FormControl<PhoneInputValue>(null, {
+  validators: [Validators.required],
+});
+```
+
+The `required` input only forwards the native `required` attribute to the rendered `<input>`. Angular form validity should be configured with `Validators.required` in reactive forms or the Angular `required` validator in template-driven forms.
 
 | Configuration | Form value |
 | --- | --- |

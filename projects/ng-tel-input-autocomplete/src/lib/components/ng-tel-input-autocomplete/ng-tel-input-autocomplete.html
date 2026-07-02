@@ -1,13 +1,13 @@
 <div
-  class="input-shell"
-  [class.focused]="isFocused()"
-  [class.invalid]="isInvalid()"
-  [class.disabled]="isDisabled()"
-  [class.readonly]="isReadOnly()"
-  [class.fluid]="fluid()"
-  [class.filled]="variant() === 'filled'"
-  [class.small]="size() === 'small'"
-  [class.large]="size() === 'large'"
+  class="ngti-input-shell"
+  [class.ngti-is-focused]="isFocused()"
+  [class.ngti-is-invalid]="isInvalid()"
+  [class.ngti-is-disabled]="isDisabled()"
+  [class.ngti-is-readonly]="isReadOnly()"
+  [class.ngti-is-fluid]="fluid()"
+  [class.ngti-variant-filled]="variant() === 'filled'"
+  [class.ngti-size-small]="size() === 'small'"
+  [class.ngti-size-large]="size() === 'large'"
   [ngClass]="containerClass()"
   [ngStyle]="containerStyle()"
   cdkOverlayOrigin
@@ -17,7 +17,7 @@
   <button
     #flagTrigger
     type="button"
-    class="country-trigger"
+    class="ngti-country-trigger"
     [ngClass]="countryButtonClass()"
     [ngStyle]="countryButtonStyle()"
     cdkOverlayOrigin
@@ -38,26 +38,26 @@
         />
       } @else {
         @if (flagMode() === 'image') {
-          <img class="flag-image" [src]="getFlagUrl(country.code)" alt="" referrerpolicy="no-referrer" />
+          <img class="ngti-flag-image" [src]="getFlagUrl(country.code)" alt="" referrerpolicy="no-referrer" />
         } @else {
-          <span class="flag-emoji" aria-hidden="true">{{ country.flag }}</span>
+          <span class="ngti-flag-emoji" aria-hidden="true">{{ country.flag }}</span>
         }
-        <span class="dial-code">{{ country.dialCode }}</span>
+        <span class="ngti-dial-code">{{ country.dialCode }}</span>
       }
     } @else {
-      <span class="flag-emoji" aria-hidden="true">🌐</span>
+      <span class="ngti-flag-emoji" aria-hidden="true">🌐</span>
     }
     <lib-tel-icon
       name="chevron-down"
-      class="chevron"
-      [class.open]="isOpen()"
+      class="ngti-chevron"
+      [class.ngti-is-open]="isOpen()"
       aria-hidden="true"
     />
   </button>
 
   <input
     #phoneInput
-    class="phone-input"
+    class="ngti-phone-input"
     [ngClass]="inputClass()"
     [ngStyle]="inputStyle()"
     type="tel"
@@ -96,20 +96,20 @@
     (blur)="onBlur($event)"
   />
 
-  <div class="actions" [ngClass]="actionsClass()" [ngStyle]="actionsStyle()">
+  <div class="ngti-actions" [ngClass]="actionsClass()" [ngStyle]="actionsStyle()">
     @if (showClear() && inputValue() && !isDisabled() && !isReadOnly()) {
-      <button type="button" class="clear-button" aria-label="Clear phone number" (click)="clearValue()">
+      <button type="button" class="ngti-clear-button" aria-label="Clear phone number" (click)="clearValue()">
         <lib-tel-icon name="close" aria-hidden="true" />
       </button>
     }
 
     @if (validationEnabled()) {
       @if (isInvalid()) {
-        <span class="status-icon invalid" title="Invalid phone number">
+        <span class="ngti-status-icon ngti-is-invalid" title="Invalid phone number">
           <lib-tel-icon name="error" aria-hidden="true" />
         </span>
       } @else if (inputValue() && isValid()) {
-        <span class="status-icon fade-in" title="Valid phone number">
+        <span class="ngti-status-icon ngti-fade-in" title="Valid phone number">
           <lib-tel-icon name="check" aria-hidden="true" />
         </span>
       }
@@ -118,21 +118,21 @@
 </div>
 
 @if (isInvalid()) {
-  <span class="sr-only" [id]="inputId() + '-error'" role="alert">Invalid phone number</span>
+  <span class="ngti-sr-only" [id]="inputId() + '-error'" role="alert">Invalid phone number</span>
 }
 
 @if (suggestedCountry(); as suggested) {
   @if (suggested.code !== selectedCountry()?.code) {
-    <div class="detection fade-in">
-      <span class="detection-copy">
+    <div class="ngti-detection ngti-fade-in">
+      <span class="ngti-detection-copy">
         @if (flagMode() === 'image') {
-          <img class="flag-image small" [src]="getFlagUrl(suggested.code)" alt="" referrerpolicy="no-referrer" />
+          <img class="ngti-flag-image ngti-size-small" [src]="getFlagUrl(suggested.code)" alt="" referrerpolicy="no-referrer" />
         } @else {
           <span aria-hidden="true">{{ suggested.flag }}</span>
         }
         <span>Detected: <strong>{{ suggested.name }}</strong> ({{ suggested.dialCode }})</span>
       </span>
-      <button type="button" class="switch-button" (click)="selectSuggestedCountry()">
+      <button type="button" class="ngti-switch-button" (click)="selectSuggestedCountry()">
         Switch country
       </button>
     </div>
@@ -159,6 +159,7 @@
     [activeIndex]="activeCountryIndex()"
     [flagMode]="flagMode()"
     [flagUrl]="flagUrl()"
+    [direction]="direction()"
     [countryTemplate]="countryTemplate()"
     [emptyTemplate]="emptyTemplate()"
     [loadingTemplate]="loadingTemplate()"
@@ -192,6 +193,7 @@
     [searchQuery]="inputValue()"
     [flagMode]="flagMode()"
     [flagUrl]="flagUrl()"
+    [direction]="direction()"
     [suggestionTemplate]="suggestionTemplate()"
     [emptyTemplate]="emptyTemplate()"
     [loadingTemplate]="loadingTemplate()"

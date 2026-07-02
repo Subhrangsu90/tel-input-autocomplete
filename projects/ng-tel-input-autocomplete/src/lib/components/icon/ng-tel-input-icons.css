@@ -1,0 +1,21 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.ngti-icon {
+  display: block;
+  flex: none;
+}
+
+.ngti-icon-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ngti-icon-md {
+  width: 1.25rem;
+  height: 1.25rem;
+}
