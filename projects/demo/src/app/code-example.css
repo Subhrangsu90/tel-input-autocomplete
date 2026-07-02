@@ -1,0 +1,96 @@
+.code-example {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--demo-border);
+  border-radius: 0.875rem;
+  background: var(--demo-bg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(26 46 31 / 0.04);
+  margin-bottom: 1rem;
+}
+
+.code-example__preview {
+  padding: 1.25rem;
+}
+
+.code-example__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--demo-bg-subtle);
+  border-top: 1px solid var(--demo-border-subtle);
+}
+
+.code-example__actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.code-btn--stackblitz {
+  background: #1389fd !important;
+  color: white !important;
+  border: none !important;
+  margin-left: auto;
+  font-weight: 700 !important;
+}
+
+.code-btn--stackblitz:hover {
+  background: #0b76db !important;
+}
+
+.code-example__code {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--demo-border-subtle);
+}
+
+.code-tabs {
+  display: flex;
+  background: var(--demo-dark-mid);
+  padding: 0.35rem 0.5rem 0;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--demo-dark-border);
+}
+
+.code-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--demo-text-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.375rem 0.375rem 0 0;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.code-tab-btn:hover {
+  color: var(--demo-dark-text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.code-tab-btn--active {
+  color: #edf5ef !important;
+  background: var(--demo-dark) !important;
+  border: 1px solid var(--demo-dark-border);
+  border-bottom-color: var(--demo-dark);
+}
+
+.code-pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: var(--demo-dark);
+  color: var(--demo-dark-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  max-height: 24rem;
+}
+
+.code-pre code {
+  white-space: pre;
+  display: block;
+}

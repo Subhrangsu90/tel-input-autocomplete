@@ -1,236 +1,222 @@
-<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-between">
-  <!-- Container -->
-  <div class="max-w-4xl mx-auto w-full space-y-8">
-    <!-- Header -->
-    <div class="text-center space-y-2">
-      <h1 class="text-4xl font-extrabold tracking-tight text-blue-600 sm:text-5xl">
-        ChaiCode Autocomplete Tel Input
-      </h1>
-      <p class="max-w-2xl mx-auto text-lg text-gray-500">
-        A self-contained international telephone input component using intl-tel-input, Angular CDK
-        Overlay, and Reactive Forms.
-      </p>
-    </div>
+<div class="demo-page">
+  <!-- Hero -->
+  <header class="demo-hero">
+    <div class="demo-hero__badge">ChaiCode Libraries</div>
+    <h1>ng-tel-input-autocomplete</h1>
+    <p>
+      International telephone input with country picker, validation, and contact autocomplete.
+      Explore integration recipes below — each panel is copy-ready for production apps.
+    </p>
+  </header>
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Left Column: Form & Component -->
-      <div class="md:col-span-2 space-y-6">
-        <div
-          class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 space-y-6"
-        >
-          <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <svg
-              class="h-5 w-5 text-blue-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
-            Interactive Input Demo
-          </h2>
+  <!-- Tab navigation -->
+  <nav class="demo-tabs" aria-label="Demo sections">
+    @for (tab of demoTabs; track tab.id) {
+      <button
+        type="button"
+        class="demo-tabs__btn"
+        [class.demo-tabs__btn--active]="isActiveTab(tab.id)"
+        (click)="setActiveTab(tab.id)"
+      >
+        <span class="demo-tabs__label">{{ tab.label }}</span>
+        <span class="demo-tabs__desc">{{ tab.description }}</span>
+      </button>
+    }
+  </nav>
 
-          <form [formGroup]="testForm" class="space-y-6">
-            <!-- Autocomplete Input Section -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-800">
-                International Phone Input (with Contact Autocomplete)
-              </label>
-              <p class="text-xs text-gray-400 mb-2">
-                Type contact names (e.g. John, Jane, Bob) or phone digits to search mock contacts.
-              </p>
-              <ng-tel-input-autocomplete
-                formControlName="phoneAutocomplete"
-                [suggestions]="suggestions()"
-                flagMode="image"
-                [suggestionsLoading]="loading()"
-                [suggestionsExhausted]="suggestionsExhausted()"
-                (suggestionSearch)="onQueryChange($event)"
-                (loadMoreSuggestions)="onLoadMore()"
-                size="small"
-                [invalid]="
-                  testForm.controls.phoneAutocomplete.invalid &&
-                  (testForm.controls.phoneAutocomplete.dirty ||
-                    testForm.controls.phoneAutocomplete.touched)
-                "
-              />
+  <main class="demo-main">
+    <!-- ── Playground ── -->
+    @if (isActiveTab('playground')) {
+      <div class="demo-grid demo-grid--playground">
+        <section class="demo-card demo-card--wide">
+          <div class="demo-card__header">
+            <h2>Interactive playground</h2>
+            <p>Reactive forms with autocomplete search, validation, and configurable options.</p>
+          </div>
 
-              <!-- Error Messages for Autocomplete Input -->
-              @if (
-                testForm.controls.phoneAutocomplete.touched &&
-                testForm.controls.phoneAutocomplete.errors
-              ) {
-                <div
-                  class="text-red-500 text-xs flex items-center gap-1.5 mt-1.5 bg-red-50 border border-red-100 p-2.5 rounded-xl animate-pulse"
-                >
-                  <svg
-                    class="h-4 w-4 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  <span>
+
+
+          <demo-code-example
+            title="Interactive Autocomplete Playground"
+            [htmlCode]="playgroundHtml"
+            [tsCode]="playgroundTs"
+          >
+            <form [formGroup]="testForm" class="demo-form">
+              <div class="demo-field">
+                <label class="demo-label">Phone with contact autocomplete</label>
+                <p class="demo-hint">Type a name (John, Jane, Bob) or digits to search mock contacts.</p>
+                <ng-tel-input-autocomplete
+                  formControlName="phoneAutocomplete"
+                  [suggestions]="suggestions()"
+                  flagMode="image"
+                  [suggestionsLoading]="loading()"
+                  [suggestionsExhausted]="suggestionsExhausted()"
+                  (suggestionSearch)="onQueryChange($event)"
+                  (loadMoreSuggestions)="onLoadMore()"
+                  size="small"
+                  [invalid]="
+                    testForm.controls.phoneAutocomplete.invalid &&
+                    (testForm.controls.phoneAutocomplete.dirty ||
+                      testForm.controls.phoneAutocomplete.touched)
+                  "
+                />
+                @if (
+                  testForm.controls.phoneAutocomplete.touched &&
+                  testForm.controls.phoneAutocomplete.errors
+                ) {
+                  <div class="demo-error">
                     @if (testForm.controls.phoneAutocomplete.errors['required']) {
                       Phone number is required.
                     } @else if (testForm.controls.phoneAutocomplete.errors['invalidPhoneNumber']) {
                       Please enter a valid international telephone number.
                     }
-                  </span>
-                </div>
-              }
-            </div>
-
-            <!-- Normal Tel Input Section -->
-            <div class="space-y-2 pt-4 border-t border-gray-150/65">
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-800">
-                    Normal Tel Input (No Autocomplete / Suggestions)
-                  </label>
-                  <p class="text-xs text-gray-400">
-                    Standard international input. Only flags and formatting/validation enabled.
-                  </p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-4 select-none">
-                  <!-- Alphanumeric Switch -->
-                  <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      [checked]="contactSearchEnabled()"
-                      (change)="onAlphanumericChange($event)"
-                      class="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 border-gray-300"
-                    />
-                    <span class="text-xs font-semibold text-gray-500">Allow Alphanumeric</span>
-                  </label>
-
-                  <!-- Validation Switch -->
-                  <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      [checked]="validationEnabled()"
-                      (change)="onValidationChange($event)"
-                      class="rounded text-blue-600 focus:ring-blue-500/20 w-4 h-4 border-gray-300"
-                    />
-                    <span class="text-xs font-semibold text-gray-500">Enable Validation</span>
-                  </label>
-
-                  <!-- Default Country Config Selector -->
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold text-gray-500">Default Country:</span>
-                    <select
-                      [value]="defaultCountry()"
-                      (change)="onDefaultCountryChange($event)"
-                      class="bg-gray-50 border border-gray-200 text-gray-700 text-xs rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500/30"
-                    >
-                      <option value="US">🇺🇸 US</option>
-                      <option value="IN">🇮🇳 IN</option>
-                      <option value="GB">🇬🇧 GB</option>
-                      <option value="DE">🇩🇪 DE</option>
-                      <option value="FR">🇫🇷 FR</option>
-                    </select>
                   </div>
-                </div>
+                }
               </div>
 
-              <ng-tel-input-autocomplete
-                formControlName="phoneNormal"
-                [suggestionsEnabled]="false"
-                [contactSearchEnabled]="contactSearchEnabled()"
-                [validationEnabled]="validationEnabled()"
-                [defaultCountry]="defaultCountry()"
-                [placeholder]="
-                  contactSearchEnabled()
-                    ? 'Type a contact name or phone number...'
-                    : 'Enter phone number...'
-                "
-              />
+              <div class="demo-field demo-field--divider">
+                <div class="demo-field__row">
+                  <div>
+                    <label class="demo-label">Standard tel input (no suggestions)</label>
+                    <p class="demo-hint">Flags, formatting, and optional validation only.</p>
+                  </div>
+                  <div class="demo-toggles">
+                    <label class="demo-toggle">
+                      <input
+                        type="checkbox"
+                        [checked]="contactSearchEnabled()"
+                        (change)="onAlphanumericChange($event)"
+                      />
+                      Allow alphanumeric
+                    </label>
+                    <label class="demo-toggle">
+                      <input
+                        type="checkbox"
+                        [checked]="validationEnabled()"
+                        (change)="onValidationChange($event)"
+                      />
+                      Validation
+                    </label>
+                    <label class="demo-toggle">
+                      Default country
+                      <select [value]="defaultCountry()" (change)="onDefaultCountryChange($event)">
+                        <option value="US">🇺🇸 US</option>
+                        <option value="IN">🇮🇳 IN</option>
+                        <option value="GB">🇬🇧 GB</option>
+                        <option value="DE">🇩🇪 DE</option>
+                        <option value="FR">🇫🇷 FR</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
 
-              <!-- Error Messages for Normal Input -->
-              @if (testForm.controls.phoneNormal.touched && testForm.controls.phoneNormal.errors) {
-                <div
-                  class="text-red-500 text-xs flex items-center gap-1.5 mt-1.5 bg-red-50 border border-red-100 p-2.5 rounded-xl animate-pulse"
-                >
-                  <svg
-                    class="h-4 w-4 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  <span>
+                <ng-tel-input-autocomplete
+                  formControlName="phoneNormal"
+                  [suggestionsEnabled]="false"
+                  [contactSearchEnabled]="contactSearchEnabled()"
+                  [validationEnabled]="validationEnabled()"
+                  [defaultCountry]="defaultCountry()"
+                  [placeholder]="
+                    contactSearchEnabled()
+                      ? 'Type a contact name or phone number...'
+                      : 'Enter phone number...'
+                  "
+                />
+                @if (testForm.controls.phoneNormal.touched && testForm.controls.phoneNormal.errors) {
+                  <div class="demo-error">
                     @if (testForm.controls.phoneNormal.errors['required']) {
                       Phone number is required.
                     } @else if (testForm.controls.phoneNormal.errors['invalidPhoneNumber']) {
                       Please enter a valid international telephone number.
                     }
-                  </span>
-                </div>
-              }
-            </div>
-          </form>
+                  </div>
+                }
+              </div>
+            </form>
+          </demo-code-example>
 
-          <!-- Component Actions -->
-          <div class="border-t border-gray-100 pt-6 flex flex-wrap gap-3">
-            <button
-              (click)="toggleDisabledState()"
-              [class]="
-                isFormDisabled()
-                  ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-              "
-              class="px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer select-none"
-            >
-              {{ isFormDisabled() ? 'Enable Form' : 'Disable Form' }}
+          <div class="demo-actions">
+            <button type="button" class="demo-btn demo-btn--ghost" (click)="toggleDisabledState()">
+              {{ isFormDisabled() ? 'Enable form' : 'Disable form' }}
             </button>
-            <button
-              (click)="setSampleValue()"
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer select-none"
-            >
-              Set UK Value
+            <button type="button" class="demo-btn demo-btn--primary" (click)="setSampleValue()">
+              Set UK sample
             </button>
-            <button
-              (click)="resetForm()"
-              class="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer select-none"
-            >
-              Reset Form
+            <button type="button" class="demo-btn demo-btn--outline" (click)="resetForm()">
+              Reset
             </button>
           </div>
-        </div>
+        </section>
+
+        <aside class="demo-sidebar">
+          <div class="demo-card">
+            <h3>Reactive form state</h3>
+            <dl class="demo-state">
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  <span
+                    class="demo-badge"
+                    [class.demo-badge--ok]="testForm.valid"
+                    [class.demo-badge--err]="!testForm.valid"
+                  >
+                    {{ testForm.status }}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>Autocomplete value</dt>
+                <dd class="demo-mono">{{ testForm.value.phoneAutocomplete || 'null' }}</dd>
+              </div>
+              <div>
+                <dt>Normal value</dt>
+                <dd class="demo-mono">{{ testForm.value.phoneNormal || 'null' }}</dd>
+              </div>
+              <div>
+                <dt>Dirty / Touched</dt>
+                <dd>{{ testForm.dirty }} / {{ testForm.touched }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="demo-card demo-card--dark">
+            <h3>Features demonstrated</h3>
+            <ul class="demo-features">
+              <li>intl-tel-input flags &amp; auto-formatting</li>
+              <li>CDK Overlay suggestion dropdown</li>
+              <li>ControlValueAccessor + Reactive Forms</li>
+              <li>Keyboard: ↑ ↓ Enter Esc Tab</li>
+              <li>Debounced API-style contact search</li>
+              <li>Highlight matched digits &amp; names</li>
+              <li>Infinite scroll (load more)</li>
+            </ul>
+          </div>
+        </aside>
       </div>
+    }
 
-      <div
-        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 space-y-6"
-      >
-        <div>
-          <h2 class="text-xl font-bold text-gray-900">Publish-ready examples</h2>
-          <p class="text-sm text-gray-500">
-            Common integration modes a production app can copy directly.
-          </p>
+    <!-- ── Form integrations ── -->
+    @if (isActiveTab('forms')) {
+      <div class="demo-section">
+        <div class="demo-section__intro">
+          <h2>Form integrations</h2>
+          <p>Common patterns for binding the component to Angular forms and output formats.</p>
         </div>
-
-        <div class="grid gap-5 lg:grid-cols-2">
+        <div class="demo-examples">
           <section class="example-panel">
-            <h3>Template-driven form</h3>
+            <div class="example-panel__head">
+              <h3>Reactive Forms</h3>
+              <span class="example-tag">formControlName</span>
+            </div>
+            <p>Used in the Playground tab — bind with <code>formControlName</code> or <code>[formControl]</code>.</p>
+            <code>Validators.required + invalidPhoneNumber</code>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Template-driven</h3>
+              <span class="example-tag">ngModel</span>
+            </div>
             <ng-tel-input-autocomplete
               inputId="template-demo-phone"
               name="templateDemoPhone"
@@ -243,184 +229,468 @@
             <code>{{ templatePhone() || 'null' }}</code>
           </section>
 
-          <section class="example-panel">
-            <h3>Object output</h3>
-            <ng-tel-input-autocomplete
-              outputFormat="object"
-              defaultCountry="GB"
-              [suggestionsEnabled]="false"
-              (valueChange)="objectValue.set($event)"
-            />
-            <code>{{ objectValue() | json }}</code>
+          <section class="example-panel example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Object output</h3>
+              <span class="example-tag">outputFormat="object"</span>
+            </div>
+            <demo-code-example
+              title="Object Output Format Example"
+              [htmlCode]="formsHtml"
+              [tsCode]="formsTs"
+            >
+              <div class="example-stack">
+                <ng-tel-input-autocomplete
+                  outputFormat="object"
+                  defaultCountry="GB"
+                  [suggestionsEnabled]="false"
+                  (valueChange)="objectValue.set($event)"
+                />
+                <code>{{ objectValue() | json }}</code>
+              </div>
+            </demo-code-example>
           </section>
 
           <section class="example-panel">
-            <h3>Restricted countries</h3>
+            <div class="example-panel__head">
+              <h3>String output (default)</h3>
+              <span class="example-tag">E.164 string</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="US"
+              [suggestionsEnabled]="false"
+              placeholder="Returns +14155552671 format"
+            />
+            <p>Default <code>outputFormat="string"</code> emits E.164 when valid.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Validation disabled</h3>
+              <span class="example-tag">validationEnabled</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="IN"
+              [suggestionsEnabled]="false"
+              [validationEnabled]="false"
+              (valueChange)="noValidationPhone.set($event)"
+            />
+            <code>{{ noValidationPhone() || 'null' }}</code>
+            <p>Accepts partial numbers without <code>invalidPhoneNumber</code> error.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Read-only &amp; disabled</h3>
+              <span class="example-tag">readOnly / disabled</span>
+            </div>
+            <div class="example-stack">
+              <ng-tel-input-autocomplete
+                defaultCountry="GB"
+                [suggestionsEnabled]="false"
+                [readOnly]="true"
+                [ngModel]="readOnlyPhone()"
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <ng-tel-input-autocomplete
+                defaultCountry="GB"
+                [suggestionsEnabled]="false"
+                [disabled]="true"
+                placeholder="Disabled input"
+              />
+            </div>
+          </section>
+        </div>
+      </div>
+    }
+
+    <!-- ── Styling & theming ── -->
+    @if (isActiveTab('styling')) {
+      <div class="demo-section">
+        <div class="demo-section__intro">
+          <h2>Styling &amp; theming</h2>
+          <p>Sizes, variants, flag modes, and CSS custom properties for design systems.</p>
+        </div>
+        <div class="demo-examples">
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Outlined (default)</h3>
+              <span class="example-tag">variant="outlined"</span>
+            </div>
+            <ng-tel-input-autocomplete
+              variant="outlined"
+              defaultCountry="US"
+              [suggestionsEnabled]="false"
+              (valueChange)="outlinedPhone.set($event)"
+            />
+            <code>{{ outlinedPhone() || 'null' }}</code>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Filled variant</h3>
+              <span class="example-tag">variant="filled"</span>
+            </div>
+            <ng-tel-input-autocomplete
+              variant="filled"
+              defaultCountry="DE"
+              [suggestionsEnabled]="false"
+              (valueChange)="filledPhone.set($event)"
+            />
+            <code>{{ filledPhone() || 'null' }}</code>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Small vs large</h3>
+              <span class="example-tag">size</span>
+            </div>
+            <div class="example-stack">
+              <ng-tel-input-autocomplete
+                size="small"
+                defaultCountry="IN"
+                [suggestionsEnabled]="false"
+              />
+              <ng-tel-input-autocomplete
+                size="large"
+                defaultCountry="IN"
+                [suggestionsEnabled]="false"
+                (valueChange)="largePhone.set($event)"
+              />
+            </div>
+            <code>{{ largePhone() || 'null' }}</code>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Emoji flags</h3>
+              <span class="example-tag">flagMode="emoji"</span>
+            </div>
+            <ng-tel-input-autocomplete
+              flagMode="emoji"
+              defaultCountry="FR"
+              [suggestionsEnabled]="false"
+            />
+            <p>Offline emoji flags — no network requests, CSP-friendly.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Image flags</h3>
+              <span class="example-tag">flagMode="image"</span>
+            </div>
+            <ng-tel-input-autocomplete
+              flagMode="image"
+              defaultCountry="JP"
+              [suggestionsEnabled]="false"
+              (valueChange)="imageFlagPhone.set($event)"
+            />
+            <code>{{ imageFlagPhone() || 'null' }}</code>
+          </section>
+
+          <section class="example-panel example-panel--dark example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Design-system theme</h3>
+              <span class="example-tag example-tag--light">CSS variables</span>
+            </div>
+            <demo-code-example
+              title="Design System Theming"
+              [htmlCode]="stylingHtml"
+              [tsCode]="stylingTs"
+              [cssCode]="stylingCss"
+            >
+              <div class="example-stack">
+                <ng-tel-input-autocomplete
+                  defaultCountry="DE"
+                  [suggestionsEnabled]="false"
+                  variant="filled"
+                  fluid
+                  (valueChange)="darkPhone.set($event)"
+                />
+                <code>{{ darkPhone() || 'null' }}</code>
+                <p>Override <code>--ngti-color-*</code> tokens on the host element.</p>
+              </div>
+            </demo-code-example>
+          </section>
+
+          <ng-template #selectedCountry let-country>
+            <span class="inline-flex items-center gap-2 font-semibold">
+              <span>{{ country.flag }}</span>
+              <span>{{ country.dialCode }}</span>
+            </span>
+          </ng-template>
+
+          <ng-template #countryOption let-country let-selected="selected">
+            <span class="flex min-w-0 items-center gap-3">
+              <span>{{ country.flag }}</span>
+              <span class="truncate">{{ country.name }}</span>
+              <span class="font-mono text-xs opacity-60">{{ country.dialCode }}</span>
+            </span>
+            @if (selected) {
+              <span class="demo-selected-label">Selected</span>
+            }
+          </ng-template>
+
+          <section class="example-panel example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Custom country templates</h3>
+              <span class="example-tag">selectedCountryTemplate</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="FR"
+              [suggestionsEnabled]="false"
+              [selectedCountryTemplate]="selectedCountry"
+              [countryTemplate]="countryOption"
+            />
+            <p>Pass <code>TemplateRef</code> inputs to customize trigger and dropdown rows.</p>
+          </section>
+        </div>
+      </div>
+    }
+
+    <!-- ── Autocomplete ── -->
+    @if (isActiveTab('autocomplete')) {
+      <div class="demo-section">
+        <div class="demo-section__intro">
+          <h2>Contact autocomplete</h2>
+          <p>Your app owns the data source — the component emits queries and renders suggestions.</p>
+        </div>
+        <div class="demo-examples">
+          <section class="example-panel example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Basic contact search</h3>
+              <span class="example-tag">suggestionSearch</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="US"
+              [suggestions]="miniSuggestions()"
+              [suggestionsLoading]="miniLoading()"
+              [suggestionsExhausted]="true"
+              (suggestionSearch)="onMiniQueryChange($event)"
+              placeholder="Search by name or number..."
+            />
+            <p>Type at least one character — results come from mock contacts after 400ms.</p>
+          </section>
+
+          <ng-template #suggestionRow let-item let-index="index" let-active="active">
+            <span class="suggestion-row" [class.suggestion-row--active]="active">
+              <span class="suggestion-row__index">{{ index + 1 }}</span>
+              <span class="suggestion-row__body">
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.phoneNumber }}</span>
+              </span>
+              @if (item.subtitle) {
+                <span class="suggestion-row__meta">{{ item.subtitle }}</span>
+              }
+            </span>
+          </ng-template>
+
+          <section class="example-panel example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Custom suggestion template</h3>
+              <span class="example-tag">suggestionTemplate</span>
+            </div>
+            <demo-code-example
+              title="Custom Suggestion Template"
+              [htmlCode]="autocompleteHtml"
+              [tsCode]="autocompleteTs"
+            >
+              <ng-tel-input-autocomplete
+                defaultCountry="GB"
+                [suggestions]="miniSuggestions()"
+                [suggestionsLoading]="miniLoading()"
+                [suggestionsExhausted]="true"
+                [suggestionTemplate]="suggestionRow"
+                (suggestionSearch)="onMiniQueryChange($event)"
+              />
+            </demo-code-example>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Alphanumeric contact search</h3>
+              <span class="example-tag">contactSearchEnabled</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="IN"
+              [suggestionsEnabled]="false"
+              [contactSearchEnabled]="true"
+              placeholder="Type a contact name..."
+            />
+            <p>Names can be entered as temporary search queries without writing to the form value.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Search on focus disabled</h3>
+              <span class="example-tag">completeOnFocus</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="US"
+              [suggestions]="miniSuggestions()"
+              [completeOnFocus]="false"
+              (suggestionSearch)="onMiniQueryChange($event)"
+            />
+            <p><code>completeOnFocus="false"</code> — waits for typing before emitting search.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Min query length</h3>
+              <span class="example-tag">minQueryLength</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="US"
+              [suggestions]="miniSuggestions()"
+              [minQueryLength]="3"
+              (suggestionSearch)="onMiniQueryChange($event)"
+            />
+            <p>Search events fire only after 3 characters are typed.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>No clear button</h3>
+              <span class="example-tag">showClear</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="CA"
+              [suggestionsEnabled]="false"
+              [showClear]="false"
+            />
+            <p>Hide the clear action when your form provides its own reset.</p>
+          </section>
+        </div>
+      </div>
+    }
+
+    <!-- ── Advanced ── -->
+    @if (isActiveTab('advanced')) {
+      <div class="demo-section">
+        <div class="demo-section__intro">
+          <h2>Advanced configuration</h2>
+          <p>Country filtering, reset behavior, events, and accessibility hooks.</p>
+        </div>
+        <div class="demo-examples">
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Allowed countries</h3>
+              <span class="example-tag">allowedCountries</span>
+            </div>
             <ng-tel-input-autocomplete
               defaultCountry="US"
               [allowedCountries]="['US', 'CA', 'GB', 'IN']"
               [suggestionsEnabled]="false"
               [resetCountryOnClear]="true"
             />
-            <p>Clear resets this field back to its configured default country.</p>
+            <p>Picker limited to US, CA, GB, IN. Clear resets to default country.</p>
           </section>
 
-          <section class="example-panel enterprise-phone-demo">
-            <h3>Design-system theme</h3>
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Excluded countries</h3>
+              <span class="example-tag">excludedCountries</span>
+            </div>
             <ng-tel-input-autocomplete
               defaultCountry="DE"
+              [excludedCountries]="['RU', 'BY', 'KP']"
               [suggestionsEnabled]="false"
-              variant="filled"
-              fluid
-              (valueChange)="darkPhone.set($event)"
             />
-            <code>{{ darkPhone() || 'null' }}</code>
+            <p>All countries except RU, BY, KP appear in the picker.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Fluid full-width</h3>
+              <span class="example-tag">fluid</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="AU"
+              [suggestionsEnabled]="false"
+              fluid
+              variant="filled"
+            />
+            <p>Stretches to container width in responsive layouts.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Accessibility labels</h3>
+              <span class="example-tag">ariaLabel</span>
+            </div>
+            <label for="a11y-phone" class="demo-label">Mobile phone</label>
+            <ng-tel-input-autocomplete
+              inputId="a11y-phone"
+              ariaLabel="Mobile phone number for two-factor authentication"
+              defaultCountry="US"
+              [suggestionsEnabled]="false"
+            />
+          </section>
+
+          <section class="example-panel example-panel--wide">
+            <div class="example-panel__head">
+              <h3>Event log</h3>
+              <span class="example-tag">valueChange, countrySelect, clear</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="IN"
+              [suggestionsEnabled]="false"
+              (valueChange)="logValueChange($event)"
+              (countrySelect)="logEvent('countrySelect', $event.country.code)"
+              (clear)="logEvent('clear')"
+              (inputFocus)="logEvent('inputFocus')"
+              (inputBlur)="logEvent('inputBlur')"
+            />
+            <div class="event-log">
+              <div class="event-log__toolbar">
+                <span>Last 8 events</span>
+                <button type="button" class="demo-btn demo-btn--ghost demo-btn--xs" (click)="clearEventLog()">
+                  Clear
+                </button>
+              </div>
+              @if (eventLog().length === 0) {
+                <p class="event-log__empty">Interact with the input above to see events.</p>
+              } @else {
+                <ul>
+                  @for (entry of eventLog(); track entry) {
+                    <li>{{ entry }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Custom container styling</h3>
+              <span class="example-tag">containerClass</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="IT"
+              [suggestionsEnabled]="false"
+              containerClass="custom-phone-shell"
+            />
+            <p>Apply classes/styles to shell, input, and dropdown parts.</p>
+          </section>
+
+          <section class="example-panel">
+            <div class="example-panel__head">
+              <h3>Enter key hint</h3>
+              <span class="example-tag">enterKeyHint</span>
+            </div>
+            <ng-tel-input-autocomplete
+              defaultCountry="US"
+              [suggestionsEnabled]="false"
+              enterKeyHint="next"
+              placeholder="Mobile keyboard shows Next"
+            />
           </section>
         </div>
-
-        <ng-template #selectedCountry let-country>
-          <span class="inline-flex items-center gap-2 font-semibold">
-            <span>{{ country.flag }}</span>
-            <span>{{ country.dialCode }}</span>
-          </span>
-        </ng-template>
-
-        <ng-template #countryOption let-country let-selected="selected">
-          <span class="flex min-w-0 items-center gap-3">
-            <span>{{ country.flag }}</span>
-            <span class="truncate">{{ country.name }}</span>
-            <span class="font-mono text-xs text-slate-500">{{ country.dialCode }}</span>
-          </span>
-          @if (selected) {
-            <span class="text-xs font-bold text-blue-600">Selected</span>
-          }
-        </ng-template>
-
-        <section class="example-panel">
-          <h3>Custom templates</h3>
-          <ng-tel-input-autocomplete
-            defaultCountry="FR"
-            [suggestionsEnabled]="false"
-            [selectedCountryTemplate]="selectedCountry"
-            [countryTemplate]="countryOption"
-          />
-        </section>
       </div>
-      <!-- Right Column: Form State & Config -->
-      <div class="space-y-6">
-        <!-- Form State Card -->
-        <div
-          class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-6 space-y-4"
-        >
-          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <svg
-              class="h-5 w-5 text-emerald-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Reactive Form State
-          </h3>
+    }
+  </main>
 
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between border-b border-gray-50 pb-2">
-              <span class="text-gray-500 font-medium">Status</span>
-              <span
-                [class]="
-                  testForm.valid ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
-                "
-                class="px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider"
-              >
-                {{ testForm.status }}
-              </span>
-            </div>
-            <div class="flex flex-col border-b border-gray-50 pb-2">
-              <span class="text-gray-500 font-medium mb-1">Autocomplete Value</span>
-              <span class="font-mono text-gray-700 font-semibold break-all text-right">
-                {{ testForm.value.phoneAutocomplete ? testForm.value.phoneAutocomplete : 'null' }}
-              </span>
-            </div>
-            <div class="flex flex-col border-b border-gray-50 pb-2">
-              <span class="text-gray-500 font-medium mb-1">Normal Tel Value</span>
-              <span class="font-mono text-gray-700 font-semibold break-all text-right">
-                {{ testForm.value.phoneNormal ? testForm.value.phoneNormal : 'null' }}
-              </span>
-            </div>
-            <div class="flex justify-between border-b border-gray-50 pb-2">
-              <span class="text-gray-500 font-medium">Dirty</span>
-              <span class="text-gray-700 font-semibold">{{ testForm.dirty }}</span>
-            </div>
-            <div class="flex justify-between border-b border-gray-50 pb-2">
-              <span class="text-gray-500 font-medium">Touched</span>
-              <span class="text-gray-700 font-semibold">{{ testForm.touched }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Features Checked Card -->
-        <div
-          class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-xl p-6 space-y-4"
-        >
-          <h3 class="text-lg font-bold flex items-center gap-2">
-            <svg
-              class="h-5 w-5 text-blue-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            Features Verified
-          </h3>
-          <ul class="space-y-2 text-xs text-slate-300">
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              intl-tel-input Country flag & Auto-formatting
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              Angular CDK Overlay suggestion dropdown
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              ControlValueAccessor & Reactive Forms integration
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              Keyboard navigation: ↑, ↓, Enter, Esc, Tab
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              API contact search with custom Debounce
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              Highlight matched phone & name digits
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="h-1.5 w-1.5 bg-blue-400 rounded-full"></span>
-              Infinite Scroll (load more on bottom scroll)
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="mt-12 text-center text-xs text-gray-400 border-t border-gray-200/50 pt-6">
-    Built for ChaiCode Libraries Monorepo Workspace. &copy; 2026.
-  </div>
+  <footer class="demo-footer">
+    ChaiCode Libraries Monorepo &middot; ng-tel-input-autocomplete &copy; 2026
+  </footer>
 </div>
