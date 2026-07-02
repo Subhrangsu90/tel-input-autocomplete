@@ -4,10 +4,16 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
-    "build": "ng build ng-tel-input-autocomplete && ng build demo",
+    "build": "npm run build:lib && npm run build:demo",
+    "build:lib": "ng build ng-tel-input-autocomplete",
+    "build:demo": "ng build demo",
     "watch": "ng build demo --watch --configuration development",
     "watch:lib": "ng build ng-tel-input-autocomplete --watch",
-    "test": "ng test ng-tel-input-autocomplete --watch=false && ng test demo --watch=false",
+    "test": "npm run test:lib && npm run test:demo",
+    "test:lib": "ng test ng-tel-input-autocomplete --watch=false",
+    "test:demo": "ng test demo --watch=false",
+    "pack:lib": "npm run build:lib && npm pack ./dist/ng-tel-input-autocomplete --dry-run",
+    "verify:lib": "npm run test:lib && npm run build:lib && npm run build:demo && npm pack ./dist/ng-tel-input-autocomplete --dry-run",
     "serve:ssr:demo": "node dist/demo/server/server.mjs"
   },
   "prettier": {

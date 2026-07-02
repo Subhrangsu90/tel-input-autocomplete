@@ -1,0 +1,174 @@
+<div
+  class="input-shell"
+  [class.focused]="isFocused()"
+  [class.invalid]="hasError()"
+  [class.disabled]="disabled()"
+  cdkOverlayOrigin
+  #containerOrigin="cdkOverlayOrigin"
+  #containerEl
+>
+  <button
+    #flagTrigger
+    type="button"
+    class="country-trigger"
+    cdkOverlayOrigin
+    #trigger="cdkOverlayOrigin"
+    [id]="inputId() + '-country-trigger'"
+    [disabled]="disabled()"
+    [attr.aria-label]="'Select country. Current country: ' + (selectedCountry()?.name || 'none')"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-controls]="countryListboxId"
+    (click)="toggleOverlay()"
+  >
+    @if (selectedCountry(); as country) {
+      @if (selectedCountryTemplate(); as template) {
+        <ng-container
+          [ngTemplateOutlet]="template"
+          [ngTemplateOutletContext]="{ $implicit: country, country, selected: true }"
+        />
+      } @else {
+        @if (flagMode() === 'image') {
+          <img class="flag-image" [src]="getFlagUrl(country.code)" alt="" referrerpolicy="no-referrer" />
+        } @else {
+          <span class="flag-emoji" aria-hidden="true">{{ country.flag }}</span>
+        }
+        <span class="dial-code">{{ country.dialCode }}</span>
+      }
+    } @else {
+      <span class="flag-emoji" aria-hidden="true">🌐</span>
+    }
+    <lib-tel-icon
+      name="chevron-down"
+      class="chevron"
+      [class.open]="isOpen()"
+      aria-hidden="true"
+    />
+  </button>
+
+  <input
+    #phoneInput
+    class="phone-input"
+    type="tel"
+    role="combobox"
+    [attr.aria-autocomplete]="suggestionsEnabled() ? 'list' : 'none'"
+    autocomplete="tel"
+    [id]="inputId()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-expanded]="showSuggestions()"
+    [attr.aria-controls]="suggestionsEnabled() ? suggestionsListboxId : null"
+    [attr.aria-activedescendant]="activeSuggestionId"
+    [attr.aria-invalid]="hasError()"
+    [attr.aria-describedby]="hasError() ? inputId() + '-error' : null"
+    [value]="inputValue()"
+    [disabled]="disabled()"
+    [placeholder]="placeholder() || selectedCountry()?.placeholder || 'Enter phone number'"
+    (input)="onInputChange($event)"
+    (keydown)="handleInputKeyDown($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+  />
+
+  <div class="actions">
+    @if (inputValue() && !disabled()) {
+      <button type="button" class="clear-button" aria-label="Clear phone number" (click)="clearValue()">
+        <lib-tel-icon name="close" aria-hidden="true" />
+      </button>
+    }
+
+    @if (validationEnabled()) {
+      @if (hasError()) {
+        <span class="status-icon invalid" title="Invalid phone number">
+          <lib-tel-icon name="error" aria-hidden="true" />
+        </span>
+      } @else if (inputValue() && isValid()) {
+        <span class="status-icon fade-in" title="Valid phone number">
+          <lib-tel-icon name="check" aria-hidden="true" />
+        </span>
+      }
+    }
+  </div>
+</div>
+
+@if (hasError()) {
+  <span class="sr-only" [id]="inputId() + '-error'" role="alert">Invalid phone number</span>
+}
+
+@if (suggestedCountry(); as suggested) {
+  @if (suggested.code !== selectedCountry()?.code) {
+    <div class="detection fade-in">
+      <span class="detection-copy">
+        @if (flagMode() === 'image') {
+          <img class="flag-image small" [src]="getFlagUrl(suggested.code)" alt="" referrerpolicy="no-referrer" />
+        } @else {
+          <span aria-hidden="true">{{ suggested.flag }}</span>
+        }
+        <span>Detected: <strong>{{ suggested.name }}</strong> ({{ suggested.dialCode }})</span>
+      </span>
+      <button type="button" class="switch-button" (click)="selectSuggestedCountry()">
+        Switch country
+      </button>
+    </div>
+  }
+}
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayWidth]="getOverlayWidth()"
+  [cdkConnectedOverlayOffsetY]="4"
+  (overlayOutsideClick)="closeOverlay()"
+  (detach)="closeOverlay()"
+>
+  <ng-tel-input-dropdown
+    type="countries"
+    [idPrefix]="inputId()"
+    [items]="countries()"
+    [selectedCountry]="selectedCountry()"
+    [searchQuery]="searchQuery()"
+    [loading]="loadingCountries()"
+    [hasMore]="hasMoreCountries()"
+    [activeIndex]="activeCountryIndex()"
+    [flagMode]="flagMode()"
+    [flagUrl]="flagUrl()"
+    [countryTemplate]="countryTemplate()"
+    [emptyTemplate]="emptyTemplate()"
+    [loadingTemplate]="loadingTemplate()"
+    (activeIndexChange)="activeCountryIndex.set($event)"
+    (itemSelected)="onCountryDropdownItem($event)"
+    (scrollEnd)="onScrollEndCountries()"
+    (searchChanged)="onSearchChanged($event)"
+    (closed)="closeOverlay()"
+  />
+</ng-template>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="containerOrigin"
+  [cdkConnectedOverlayOpen]="showSuggestions()"
+  [cdkConnectedOverlayWidth]="getOverlayWidth()"
+  [cdkConnectedOverlayOffsetY]="4"
+  [cdkConnectedOverlayHasBackdrop]="false"
+  (overlayOutsideClick)="closeSuggestions()"
+  (detach)="closeSuggestions()"
+>
+  <ng-tel-input-dropdown
+    type="suggestions"
+    [idPrefix]="inputId()"
+    [items]="suggestions()"
+    [loading]="suggestionsLoading()"
+    [hasMore]="!suggestionsExhausted()"
+    [activeIndex]="activeSuggestionIndex()"
+    [searchQuery]="inputValue()"
+    [flagMode]="flagMode()"
+    [flagUrl]="flagUrl()"
+    [suggestionTemplate]="suggestionTemplate()"
+    [emptyTemplate]="emptyTemplate()"
+    [loadingTemplate]="loadingTemplate()"
+    (activeIndexChange)="activeSuggestionIndex.set($event)"
+    (itemSelected)="onSuggestionDropdownItem($event)"
+    (scrollEnd)="onLoadMoreSuggestions()"
+    (closed)="closeSuggestions()"
+  />
+</ng-template>

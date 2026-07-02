@@ -1,5 +1,3 @@
-import { SomeOptions } from 'intl-tel-input';
-
 export interface Country {
   name: string;
   code: string; // ISO 3166-1 alpha-2 code
@@ -25,5 +23,34 @@ export interface PhoneSuggestion {
   avatar?: string; // Optional initials/avatar representation
 }
 
-export type NgTelInputOptions = SomeOptions;
+export interface CountrySearchResponse {
+  data: Country[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+}
 
+export interface CountryTemplateContext {
+  $implicit: Country;
+  country: Country;
+  selected: boolean;
+}
+
+export interface SuggestionTemplateContext {
+  $implicit: PhoneSuggestion;
+  suggestion: PhoneSuggestion;
+  index: number;
+  active: boolean;
+}
+
+export interface StateTemplateContext {
+  $implicit: 'countries' | 'suggestions';
+  type: 'countries' | 'suggestions';
+}
+
+export type PhoneInputValue = PhoneNumberValue | string | null;
+export type FlagMode = 'emoji' | 'image';
+export type FlagUrlResolver = (countryCode: string) => string;

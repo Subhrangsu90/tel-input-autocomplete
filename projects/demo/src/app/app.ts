@@ -50,11 +50,11 @@ export class App implements OnInit {
   // State signals
   protected readonly suggestions = signal<PhoneSuggestion[]>([]);
   protected readonly loading = signal(false);
-  protected readonly allLoaded = signal(false);
+  protected readonly suggestionsExhausted = signal(false);
   protected readonly isFormDisabled = signal(false);
-  protected readonly selectedDefaultCountryCode = signal<string>('IN');
-  protected readonly selectedAllowAlphanumeric = signal<boolean>(false);
-  protected readonly selectedEnableValidation = signal<boolean>(true);
+  protected readonly defaultCountry = signal('IN');
+  protected readonly contactSearchEnabled = signal(false);
+  protected readonly validationEnabled = signal(true);
 
   private readonly querySubject = new Subject<string>();
   private currentQuery = '';
@@ -70,7 +70,7 @@ export class App implements OnInit {
     ).subscribe(query => {
       this.currentQuery = query;
       this.currentPage = 0;
-      this.allLoaded.set(false);
+      this.suggestionsExhausted.set(false);
       this.fetchSuggestions(query, true);
     });
   }
@@ -84,24 +84,24 @@ export class App implements OnInit {
   // Handle changes to default country config
   protected onDefaultCountryChange(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
-    this.selectedDefaultCountryCode.set(value);
+    this.defaultCountry.set(value);
   }
 
   // Handle changes to alphanumeric permission config
   protected onAlphanumericChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.selectedAllowAlphanumeric.set(checked);
+    this.contactSearchEnabled.set(checked);
   }
 
   // Handle changes to validation config
   protected onValidationChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.selectedEnableValidation.set(checked);
+    this.validationEnabled.set(checked);
   }
 
   // Handle infinite scroll triggering load more
   protected onLoadMore() {
-    if (this.loading() || this.allLoaded()) return;
+    if (this.loading() || this.suggestionsExhausted()) return;
 
     this.currentPage++;
     this.loading.set(true);
@@ -157,7 +157,7 @@ export class App implements OnInit {
       }
 
       if (startIndex + this.pageSize >= filtered.length) {
-        this.allLoaded.set(true);
+        this.suggestionsExhausted.set(true);
       }
 
       this.loading.set(false);

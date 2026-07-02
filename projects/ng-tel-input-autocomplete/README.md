@@ -1,64 +1,191 @@
-# NgTelInputAutocomplete
+# ng-tel-input-autocomplete
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, and optional paginated country APIs.
 
-## Code scaffolding
+## Compatibility
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Library | Angular | Node.js |
+| --- | --- | --- |
+| 0.0.x | 21.2.x | 20.19+, 22.12+, or 24+ |
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Installation
 
 ```bash
-ng generate --help
+npm install ng-tel-input-autocomplete @angular/cdk
 ```
 
-## Building
+Angular, Angular Forms, CDK, and RxJS are peer dependencies. The package installs `google-libphonenumber` and `intl-tel-input` for phone metadata, formatting, and validation.
 
-To build the library, run:
+No Tailwind, global stylesheet, or external flag service is required. Styles are encapsulated in the components and emoji flags are the default.
+
+For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](./API.md).
+
+## Reactive Forms
+
+```ts
+import { Component } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { NgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
+
+@Component({
+  selector: 'app-contact-form',
+  standalone: true,
+  imports: [ReactiveFormsModule, NgTelInputAutocomplete],
+  template: `
+    <label for="work-phone">Work phone</label>
+    <ng-tel-input-autocomplete
+      inputId="work-phone"
+      [formControl]="phone"
+      defaultCountry="IN"
+      [suggestionsEnabled]="false"
+    />
+  `,
+})
+export class ContactForm {
+  readonly phone = new FormControl<string | null>(null);
+}
+```
+
+## Template-driven Forms
+
+```html
+<ng-tel-input-autocomplete
+  inputId="mobile-phone"
+  ariaLabel="Mobile phone"
+  [(ngModel)]="phone"
+  name="phone"
+/>
+```
+
+Import `FormsModule` in the consuming component.
+
+## Contact autocomplete
+
+The library emits the current query; your application owns the contact source and passes matching suggestions back.
+
+```html
+<ng-tel-input-autocomplete
+  [formControl]="phone"
+  [suggestions]="suggestions"
+  [suggestionsLoading]="loading"
+  [suggestionsExhausted]="suggestionsExhausted"
+  (suggestionSearch)="searchContacts($event)"
+  (loadMoreSuggestions)="loadNextPage()"
+/>
+```
+
+```ts
+import { PhoneSuggestion } from 'ng-tel-input-autocomplete';
+
+suggestions: PhoneSuggestion[] = [
+  { name: 'Asha Rao', phoneNumber: '+919876543210', countryCode: 'IN' },
+];
+```
+
+Alphabetic search text is emitted through `suggestionSearch` but is not written to the form control. Selecting a suggestion writes its phone value.
+
+## Values and validation
+
+The default `outputFormat="string"` emits a valid E.164 value such as `+919876543210`. While an incomplete number is being edited, the current display value is emitted. Set `outputFormat="object"` for:
+
+```ts
+interface PhoneNumberValue {
+  countryCode: string;
+  dialCode: string;
+  number: string;
+  formattedNumber: string;
+  fullNumber: string;
+}
+```
+
+Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validationEnabled]="false"` to disable the library validator.
+
+## Inputs
+
+| Input | Type | Default | Purpose |
+| --- | --- | --- | --- |
+| `inputId` | `string` | generated | Native input ID; set it when using a visible label |
+| `ariaLabel` | `string` | `International phone number` | Accessible label when no external label is present |
+| `defaultCountry` | `string` | `US` | Default ISO alpha-2 country code |
+| `allowedCountries` | `readonly string[]` | `[]` | Restrict the country list |
+| `excludedCountries` | `readonly string[]` | `[]` | Remove countries from the list |
+| `outputFormat` | `string \| object` | `string` | Form/output value representation |
+| `placeholder` | `string` | `Enter phone number...` | Input placeholder |
+| `countrySearchUrl` | `string \| null` | `null` | Optional paginated country endpoint |
+| `suggestionsEnabled` | `boolean` | `true` | Enable external contact suggestions |
+| `contactSearchEnabled` | `boolean` | `true` | Permit contact-name search text |
+| `validationEnabled` | `boolean` | `true` | Enable phone validation |
+| `suggestions` | `readonly PhoneSuggestion[]` | `[]` | Current suggestion page |
+| `suggestionsLoading` | `boolean` | `false` | Show suggestion loading state |
+| `suggestionsExhausted` | `boolean` | `false` | Prevent further `loadMoreSuggestions` events |
+| `flagMode` | `emoji \| image` | `emoji` | Offline emoji flags or image flags |
+| `flagUrl` | `(code: string) => string` | `null` | Custom flag image URL resolver |
+| `selectedCountryTemplate` | `TemplateRef<CountryTemplateContext> \| null` | `null` | Custom selected-country content |
+| `countryTemplate` | `TemplateRef<CountryTemplateContext> \| null` | `null` | Custom country option content |
+| `suggestionTemplate` | `TemplateRef<SuggestionTemplateContext> \| null` | `null` | Custom suggestion option content |
+| `emptyTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Custom empty state |
+| `loadingTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Custom loading state |
+
+## Outputs
+
+| Output | Payload | Purpose |
+| --- | --- | --- |
+| `suggestionSearch` | `string` | Request contact suggestions |
+| `loadMoreSuggestions` | `void` | Request another suggestion page |
+| `valueChange` | `string \| PhoneNumberValue \| null` | Observe values without Angular Forms |
+| `countryLoadError` | `unknown` | Handle country endpoint failures |
+
+## Country API
+
+Call `provideHttpClient()` in the application when `countrySearchUrl` is used:
+
+```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideHttpClient(withFetch())],
+};
+```
+
+The endpoint receives `q`, `page`, and `limit` query parameters and must return:
+
+```json
+{
+  "data": [{ "name": "India", "code": "IN", "dialCode": "+91", "flag": "🇮🇳", "format": "", "placeholder": "98765 43210" }],
+  "meta": { "page": 1, "limit": 15, "total": 1, "hasMore": false }
+}
+```
+
+During server rendering, the local country dataset is used to keep rendering deterministic.
+
+## Image flags
+
+Emoji flags avoid network requests and work with strict Content Security Policies. To use images:
+
+```html
+<ng-tel-input-autocomplete
+  flagMode="image"
+  [flagUrl]="flagUrl"
+/>
+```
+
+```ts
+readonly flagUrl = (code: string) => `/assets/flags/${code.toLowerCase()}.svg`;
+```
+
+If image mode is selected without a resolver, the component falls back to `https://flagcdn.com/{code}.svg`.
+
+## Development and publishing
 
 ```bash
-ng build ng-tel-input-autocomplete
+npm run test:lib
+npm run build:lib
+npm run verify:lib
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+`verify:lib` tests the library, builds the production package and demo against `dist`, and performs an npm package dry run. Publishing should be performed from `dist/ng-tel-input-autocomplete` through the release workflow.
 
-### Publishing the Library
+## License
 
-Once the project is built, you can publish your library by following these steps:
-
-1. Navigate to the `dist` directory:
-
-   ```bash
-   cd dist/ng-tel-input-autocomplete
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+MIT

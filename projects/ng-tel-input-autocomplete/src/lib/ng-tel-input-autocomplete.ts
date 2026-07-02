@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  TemplateRef,
   ElementRef,
   signal,
   effect,
@@ -11,9 +12,10 @@ import {
   output,
   input,
   viewChild,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  untracked
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
@@ -30,188 +32,28 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTelInputAutocompleteService } from './ng-tel-input-autocomplete.service';
 import { NgTelInputDropdown } from './ng-tel-input-dropdown';
 import { NgTelInputIcon } from './ng-tel-input-icons';
-import { Country, PhoneNumberValue, PhoneSuggestion, NgTelInputOptions } from './ng-tel-input-autocomplete.types';
+import {
+  CountrySearchResponse,
+  Country,
+  CountryTemplateContext,
+  FlagMode,
+  FlagUrlResolver,
+  PhoneInputValue,
+  StateTemplateContext,
+  SuggestionTemplateContext,
+  PhoneNumberValue,
+  PhoneSuggestion,
+} from './ng-tel-input-autocomplete.types';
+
+let nextUniqueId = 0;
+type DropdownItem = Country | PhoneSuggestion;
 
 @Component({
-  selector: 'lib-ng-tel-input-autocomplete',
+  selector: 'ng-tel-input-autocomplete',
   standalone: true,
-  imports: [CommonModule, OverlayModule, NgTelInputDropdown, NgTelInputIcon],
-  template: `
-    <div 
-      class="relative flex items-stretch border rounded-xl overflow-hidden transition-all duration-200 bg-white shadow-sm"
-      [class.border-gray-200]="!disabled && !isFocused && !hasError"
-      [class.border-blue-500]="isFocused && !hasError"
-      [class.ring-2]="isFocused || hasError"
-      [class.ring-blue-500/15]="isFocused && !hasError"
-      [class.border-red-400]="hasError"
-      [class.ring-red-500/15]="hasError"
-      [class.bg-gray-50]="disabled"
-      [class.border-gray-100]="disabled"
-      id="phone-input-container"
-      cdkOverlayOrigin
-      #containerOrigin="cdkOverlayOrigin"
-      #containerEl
-    >
-      <!-- Flag Selector Trigger -->
-      <button
-        #flagTrigger
-        type="button"
-        cdkOverlayOrigin
-        #trigger="cdkOverlayOrigin"
-        (click)="toggleOverlay()"
-        [disabled]="disabled"
-        class="flex items-center gap-2 px-3 bg-gray-50 border-r border-gray-200 hover:bg-gray-100/80 active:bg-gray-200/50 cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-50 disabled:hover:bg-gray-50 transition-all duration-150 select-none outline-none focus:bg-gray-100 focus:ring-1 focus:ring-blue-500/30 shrink-0"
-        id="country-selector-trigger"
-      >
-        @if (selectedCountry()) {
-          <img
-            [src]="'https://flagcdn.com/' + selectedCountry()?.code?.toLowerCase() + '.svg'"
-            class="w-6 h-4 object-cover rounded-sm shadow-xs border border-gray-200/60 transition-transform duration-100 shrink-0"
-            [alt]="selectedCountry()?.name"
-            referrerpolicy="no-referrer"
-          />
-        } @else {
-          <span class="text-lg leading-none flex items-center shrink-0">🌐</span>
-        }
-        <span class="font-mono text-sm font-semibold text-gray-600">
-          {{ selectedCountry()?.dialCode || '' }}
-        </span>
-        <lib-tel-icon 
-          name="chevron-down" 
-          class="text-gray-400 transition-transform duration-200 shrink-0"
-          [class.rotate-180]="isOpen()"
-        ></lib-tel-icon>
-      </button>
-
-      <!-- Phone Number Input -->
-      <input
-        #phoneInput
-        type="tel"
-        [value]="inputValue"
-        (input)="onInputChange($event)"
-        (keydown)="handleInputKeyDown($event)"
-        (focus)="onFocus()"
-        (blur)="onBlur()"
-        [disabled]="disabled"
-        [placeholder]="placeholder() || selectedCountry()?.placeholder || 'Enter phone number'"
-        class="flex-1 px-4 py-2.5 bg-transparent outline-none text-gray-800 placeholder-gray-400 text-base border-0 focus:ring-0 focus:outline-none w-full disabled:cursor-not-allowed disabled:text-gray-400"
-        id="phone-number-text-input"
-        autocomplete="tel"
-      />
-
-      <!-- Validation Status / Clear Icon -->
-      <div class="flex items-center pr-3 gap-1.5 shrink-0">
-        @if (inputValue && !disabled) {
-          <button
-            type="button"
-            (click)="clearValue()"
-            class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none flex items-center justify-center"
-            title="Clear phone number"
-            id="clear-phone-input"
-          >
-            <lib-tel-icon name="close" class="w-4 h-4"></lib-tel-icon>
-          </button>
-        }
-        
-        @if (enableValidation()) {
-          @if (hasError) {
-            <lib-tel-icon class="text-red-500 w-5 h-5 flex items-center justify-center" name="error" title="Invalid phone number"></lib-tel-icon>
-          } @else if (inputValue && isValid()) {
-            <lib-tel-icon class="text-emerald-500 w-5 h-5 flex items-center justify-center animate-fade-in" name="check" title="Valid phone number"></lib-tel-icon>
-          }
-        }
-      </div>
-    </div>
-
-    <!-- Smart Country Suggestion Banner -->
-    @if (suggestedCountry() && suggestedCountry()?.code !== selectedCountry()?.code) {
-      <div class="mt-2 text-xs flex items-center justify-between bg-blue-50/70 border border-blue-100 rounded-xl px-3.5 py-2.5 animate-fade-in shadow-sm select-none">
-        <div class="flex items-center gap-2 text-gray-600 font-medium">
-          <img
-            [src]="'https://flagcdn.com/' + suggestedCountry()?.code?.toLowerCase() + '.svg'"
-            class="w-5.5 h-4 object-cover rounded shadow-xs border border-gray-200/60 shrink-0"
-            [alt]="suggestedCountry()?.name"
-            referrerpolicy="no-referrer"
-          />
-          <span>Detected: <strong class="text-gray-900 font-semibold">{{ suggestedCountry()?.name }}</strong> <span class="text-gray-400 font-mono">({{ suggestedCountry()?.dialCode }})</span></span>
-        </div>
-        <button 
-          type="button" 
-          (click)="selectSuggestedCountry()" 
-          class="text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1.5 transition-colors duration-150 focus:outline-none focus:underline cursor-pointer border-0 bg-transparent"
-          id="switch-suggested-country-btn"
-        >
-          <span>Switch country flag</span>
-          <lib-tel-icon name="chevron-down" class="-rotate-90 w-3 h-3 font-bold"></lib-tel-icon>
-        </button>
-      </div>
-    }
-
-    <!-- Country Dropdown Overlay -->
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="trigger"
-      [cdkConnectedOverlayOpen]="isOpen()"
-      [cdkConnectedOverlayWidth]="getOverlayWidth()"
-      [cdkConnectedOverlayOffsetY]="4"
-      (overlayOutsideClick)="closeOverlay()"
-      (detach)="closeOverlay()"
-    >
-      <lib-ng-tel-input-dropdown
-        type="countries"
-        [items]="countries()"
-        [selectedCountry]="selectedCountry()"
-        [searchQuery]="searchQuery()"
-        [loading]="loadingCountries()"
-        [hasMore]="hasMoreCountries()"
-        [activeIndex]="activeCountryIndex()"
-        (activeIndexChange)="activeCountryIndex.set($event)"
-        (itemSelected)="onCountrySelected($event)"
-        (scrollEnd)="onScrollEndCountries()"
-        (searchChanged)="onSearchChanged($event)"
-        (closed)="closeOverlay()"
-      />
-    </ng-template>
-
-    <!-- Suggestions Overlay -->
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="containerOrigin"
-      [cdkConnectedOverlayOpen]="showSuggestions()"
-      [cdkConnectedOverlayWidth]="getOverlayWidth()"
-      [cdkConnectedOverlayOffsetY]="4"
-      [cdkConnectedOverlayHasBackdrop]="true"
-      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-      (backdropClick)="closeSuggestions()"
-      (detach)="closeSuggestions()"
-    >
-      <lib-ng-tel-input-dropdown
-        type="suggestions"
-        [items]="suggestions()"
-        [loading]="loading()"
-        [hasMore]="!allLoaded()"
-        [activeIndex]="activeSuggestionIndex()"
-        (activeIndexChange)="activeSuggestionIndex.set($event)"
-        [searchQuery]="inputValue"
-        (itemSelected)="selectSuggestion($event)"
-        (scrollEnd)="onLoadMoreSuggestions()"
-        (closed)="closeSuggestions()"
-      />
-    </ng-template>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.2s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(2px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  `],
+  imports: [OverlayModule, NgTemplateOutlet, NgTelInputDropdown, NgTelInputIcon],
+  templateUrl: './ng-tel-input-autocomplete.html',
+  styleUrl: './ng-tel-input-autocomplete.css',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -231,25 +73,34 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   private readonly destroyRef = inject(DestroyRef);
 
   // Inputs
-  defaultCountryCode = input<string>('US');
-  onlyCountries = input<string[]>([]);
-  excludeCountries = input<string[]>([]);
-  valueFormat = input<'string' | 'object'>('string');
-  placeholder = input<string>('Enter phone number...');
-  options = input<NgTelInputOptions>({});
-  countriesApiUrl = input<string | null>(null);
-  enableSuggestions = input<boolean>(true);
-  allowAlphanumeric = input<boolean>(true);
-  enableValidation = input<boolean>(true);
+  readonly inputId = input(`ng-tel-input-${++nextUniqueId}`);
+  readonly ariaLabel = input('International phone number');
+  readonly defaultCountry = input('US');
+  readonly allowedCountries = input<readonly string[]>([]);
+  readonly excludedCountries = input<readonly string[]>([]);
+  readonly outputFormat = input<'string' | 'object'>('string');
+  readonly placeholder = input('Enter phone number...');
+  readonly countrySearchUrl = input<string | null>(null);
+  readonly suggestionsEnabled = input(true);
+  readonly contactSearchEnabled = input(true);
+  readonly validationEnabled = input(true);
+  readonly flagMode = input<FlagMode>('emoji');
+  readonly flagUrl = input<FlagUrlResolver | null>(null);
+  readonly selectedCountryTemplate = input<TemplateRef<CountryTemplateContext> | null>(null);
+  readonly countryTemplate = input<TemplateRef<CountryTemplateContext> | null>(null);
+  readonly suggestionTemplate = input<TemplateRef<SuggestionTemplateContext> | null>(null);
+  readonly emptyTemplate = input<TemplateRef<StateTemplateContext> | null>(null);
+  readonly loadingTemplate = input<TemplateRef<StateTemplateContext> | null>(null);
 
-  // Original library inputs/outputs for suggestion lists
-  suggestions = input<PhoneSuggestion[]>([]);
-  loading = input<boolean>(false);
-  allLoaded = input<boolean>(false);
+  // Contact suggestion list inputs/outputs
+  readonly suggestions = input<readonly PhoneSuggestion[]>([]);
+  readonly suggestionsLoading = input(false);
+  readonly suggestionsExhausted = input(false);
 
-  queryChange = output<string>();
-  loadMore = output<void>();
-  valueChange = output<PhoneNumberValue | string | null>();
+  readonly suggestionSearch = output<string>();
+  readonly loadMoreSuggestions = output<void>();
+  readonly valueChange = output<PhoneInputValue>();
+  readonly countryLoadError = output<unknown>();
 
   // Element references
   phoneInput = viewChild<ElementRef<HTMLInputElement>>('phoneInput');
@@ -269,11 +120,11 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   activeCountryIndex = signal<number>(0);
   activeSuggestionIndex = signal<number>(0);
 
-  // Standard component state
-  inputValue = '';
-  isFocused = false;
-  disabled = false;
-  hasError = false;
+  // Component state
+  inputValue = signal('');
+  isFocused = signal(false);
+  disabled = signal(false);
+  hasError = signal(false);
   private justSelectedSuggestion = false;
 
   // Pagination for Country dropdown
@@ -284,19 +135,28 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   private searchSubject = new Subject<string>();
 
   // Form Control Value Accessor callbacks
-  private onChange: (value: any) => void = () => {};
+  private onChange: (value: PhoneInputValue) => void = () => {};
   private onTouched: () => void = () => {};
+  private onValidatorChange: () => void = () => {};
+
+  private getDefaultCountry(): Country | null {
+    const initialCode = this.defaultCountry();
+    const allowedCountries = this.getFilteredStaticCountries('');
+    return allowedCountries.find(
+      country => country.code.toUpperCase() === initialCode.toUpperCase()
+    ) ?? allowedCountries[0] ?? null;
+  }
 
   private getFilteredStaticCountries(query: string): Country[] {
     let list = this.phoneService.getStaticCountries();
 
-    const only = this.onlyCountries();
+    const only = this.allowedCountries();
     if (only && only.length > 0) {
       const upperOnly = only.map(c => c.toUpperCase());
       list = list.filter(c => upperOnly.includes(c.code.toUpperCase()));
     }
 
-    const exclude = this.excludeCountries();
+    const exclude = this.excludedCountries();
     if (exclude && exclude.length > 0) {
       const upperExclude = exclude.map(c => c.toUpperCase());
       list = list.filter(c => !upperExclude.includes(c.code.toUpperCase()));
@@ -314,11 +174,14 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     return list;
   }
 
-  private getCountries(query: string, page: number, limit = this.countriesPerPage): Observable<{ data: Country[], meta: { page: number; limit: number; total: number; hasMore: boolean } }> {
-    const hasFilters = (this.onlyCountries() && this.onlyCountries().length > 0) || 
-                       (this.excludeCountries() && this.excludeCountries().length > 0);
+  private getCountries(
+    query: string,
+    page: number,
+    limit = this.countriesPerPage
+  ): Observable<CountrySearchResponse> {
+    const hasFilters = this.allowedCountries().length > 0 || this.excludedCountries().length > 0;
                         
-    if (hasFilters || !this.countriesApiUrl()) {
+    if (hasFilters || !this.countrySearchUrl()) {
       const filtered = this.getFilteredStaticCountries(query);
       const offset = (page - 1) * limit;
       return of({
@@ -332,27 +195,20 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
       });
     }
 
-    return this.phoneService.searchCountries(query, page, limit, this.countriesApiUrl());
+    return this.phoneService.searchCountries(query, page, limit, this.countrySearchUrl());
   }
 
   constructor() {
     effect(() => {
-      const code = this.defaultCountryCode();
-      const options = this.options();
-      const initialCode = options?.initialCountry || code;
-
-      const allowedStatic = this.getFilteredStaticCountries('');
-      let defaultCountry = allowedStatic.find(
-        c => c.code.toUpperCase() === (initialCode || '').toUpperCase()
-      );
-
-      if (!defaultCountry && allowedStatic.length > 0) {
-        defaultCountry = allowedStatic[0];
-      }
-
-      if (defaultCountry && !this.inputValue) {
+      const defaultCountry = this.getDefaultCountry();
+      if (defaultCountry && !untracked(this.inputValue)) {
         this.selectedCountry.set(defaultCountry);
       }
+    });
+
+    effect(() => {
+      this.validationEnabled();
+      this.onValidatorChange();
     });
   }
 
@@ -378,8 +234,9 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
         this.hasMoreCountries.set(res.meta.hasMore);
         this.loadingCountries.set(false);
       },
-      error: () => {
+      error: error => {
         this.loadingCountries.set(false);
+        this.countryLoadError.emit(error);
       }
     });
   }
@@ -396,14 +253,15 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
         this.hasMoreCountries.set(res.meta.hasMore);
         this.loadingCountries.set(false);
       },
-      error: () => {
+      error: error => {
         this.loadingCountries.set(false);
+        this.countryLoadError.emit(error);
       }
     });
   }
 
   toggleOverlay(): void {
-    if (this.disabled) return;
+    if (this.disabled()) return;
     if (this.isOpen()) {
       this.closeOverlay();
     } else {
@@ -421,11 +279,31 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     this.selectedCountry.set(country);
     
     // Reformat existing digits to fit the new country's pattern
-    const rawDigits = this.inputValue.replace(/\D/g, '');
-    this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, country.code);
+    const rawDigits = this.inputValue().replace(/\D/g, '');
+    this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, country.code));
     
     this.propagateChanges();
     this.closeOverlay();
+  }
+
+  onCountryDropdownItem(item: DropdownItem): void {
+    if (this.isCountry(item)) {
+      this.onCountrySelected(item);
+    }
+  }
+
+  onSuggestionDropdownItem(item: DropdownItem): void {
+    if (this.isPhoneSuggestion(item)) {
+      this.selectSuggestion(item);
+    }
+  }
+
+  private isCountry(item: DropdownItem): item is Country {
+    return 'dialCode' in item && 'placeholder' in item;
+  }
+
+  private isPhoneSuggestion(item: DropdownItem): item is PhoneSuggestion {
+    return 'phoneNumber' in item;
   }
 
   onSearchChanged(query: string): void {
@@ -440,7 +318,14 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   }
 
   updateSuggestedCountry(value: string): void {
-    const cleaned = value.replace(/\D/g, '');
+    const isInternational = value.startsWith('+') || value.startsWith('00');
+    if (!isInternational) {
+      this.suggestedCountry.set(null);
+      return;
+    }
+
+    const internationalValue = value.startsWith('00') ? value.slice(2) : value;
+    const cleaned = internationalValue.replace(/\D/g, '');
     if (!cleaned || cleaned.length < 1) {
       this.suggestedCountry.set(null);
       return;
@@ -458,13 +343,13 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     const suggested = this.suggestedCountry();
     if (suggested) {
       this.selectedCountry.set(suggested);
-      const rawDigits = this.inputValue.replace(/\D/g, '');
+      const rawDigits = this.inputValue().replace(/\D/g, '');
       const cleanDial = suggested.dialCode.replace('+', '');
       let remainingDigits = rawDigits;
       if (rawDigits.startsWith(cleanDial)) {
         remainingDigits = rawDigits.substring(cleanDial.length);
       }
-      this.inputValue = this.phoneService.formatPhoneNumber(remainingDigits, suggested.code);
+      this.inputValue.set(this.phoneService.formatPhoneNumber(remainingDigits, suggested.code));
       this.suggestedCountry.set(null);
       this.propagateChanges();
       this.phoneInput()?.nativeElement.focus();
@@ -472,15 +357,15 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   }
 
   updateSuggestionsState(value: string): void {
-    if (!this.enableSuggestions()) {
+    if (!this.suggestionsEnabled()) {
       this.showSuggestions.set(false);
       return;
     }
     // Notify parent query has changed to trigger suggestion updates
-    this.queryChange.emit(value);
+    this.suggestionSearch.emit(value);
     // Open overlay suggestions if we are focused and have suggestion list
     this.activeSuggestionIndex.set(0);
-    this.showSuggestions.set(this.suggestions().length > 0 && this.isFocused);
+    this.showSuggestions.set(this.suggestions().length > 0 && this.isFocused());
   }
 
   selectSuggestion(suggestion: PhoneSuggestion): void {
@@ -505,10 +390,10 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
       if (digits.startsWith(cleanDial)) {
         localDigits = digits.substring(cleanDial.length);
       }
-      this.inputValue = this.phoneService.formatPhoneNumber(localDigits, foundCountry.code);
+      this.inputValue.set(this.phoneService.formatPhoneNumber(localDigits, foundCountry.code));
       this.propagateChanges();
     } else {
-      this.inputValue = suggestion.phoneNumber;
+      this.inputValue.set(suggestion.phoneNumber);
       this.propagateChanges();
     }
     this.closeSuggestions();
@@ -520,13 +405,13 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   }
 
   onLoadMoreSuggestions(): void {
-    if (!this.loading() && !this.allLoaded()) {
-      this.loadMore.emit();
+    if (!this.suggestionsLoading() && !this.suggestionsExhausted()) {
+      this.loadMoreSuggestions.emit();
     }
   }
 
   handleInputKeyDown(event: KeyboardEvent): void {
-    if (!this.allowAlphanumeric()) {
+    if (!this.contactSearchEnabled()) {
       const allowedRegex = /^[0-9\-\+\(\)\s]$/;
       const isControlKey = event.key.length > 1;
       const isClipboardOrSelect = event.ctrlKey || event.metaKey;
@@ -537,7 +422,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
       }
     }
 
-    if (!this.enableSuggestions()) return;
+    if (!this.suggestionsEnabled()) return;
     if (!this.showSuggestions()) {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         this.showSuggestions.set(this.suggestions().length > 0);
@@ -591,28 +476,28 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
         this.selectedCountry.set(detected);
         const cleanInput = value.replace(detected.dialCode, '').replace('+', '');
         const rawDigits = cleanInput.replace(/\D/g, '');
-        this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, detected.code);
+        this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, detected.code));
         this.suggestedCountry.set(null);
         this.propagateChanges();
-        this.updateSuggestionsState(this.inputValue);
+        this.updateSuggestionsState(this.inputValue());
         return;
       }
     }
 
     this.updateSuggestedCountry(value);
 
-    if (this.allowAlphanumeric()) {
-      // Allow letters, spaces, and numbers so users can type contact names or alphanumeric values.
+    if (this.contactSearchEnabled()) {
+      // Allow letters, spaces, and numbers so users can type contact names or contact IDs.
       const hasLetters = /[a-zA-Z]/.test(value);
       if (hasLetters) {
-        this.inputValue = value;
+        this.inputValue.set(value);
       } else {
         const rawDigits = value.replace(/\D/g, '');
         const activeCountry = this.selectedCountry();
         if (activeCountry) {
-          this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, activeCountry.code);
+          this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, activeCountry.code));
         } else {
-          this.inputValue = rawDigits;
+          this.inputValue.set(rawDigits);
         }
       }
     } else {
@@ -621,57 +506,57 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
       const rawDigits = filteredValue.replace(/\D/g, '');
       const activeCountry = this.selectedCountry();
       if (activeCountry) {
-        this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, activeCountry.code);
+        this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, activeCountry.code));
       } else {
-        this.inputValue = rawDigits;
+        this.inputValue.set(rawDigits);
       }
     }
 
     this.propagateChanges();
-    this.updateSuggestionsState(this.inputValue);
+    this.updateSuggestionsState(this.inputValue());
   }
 
   onFocus(): void {
-    this.isFocused = true;
+    this.isFocused.set(true);
     if (this.justSelectedSuggestion) {
       this.justSelectedSuggestion = false;
       return;
     }
-    this.updateSuggestionsState(this.inputValue);
+    this.updateSuggestionsState(this.inputValue());
   }
 
   onBlur(): void {
-    this.isFocused = false;
+    this.isFocused.set(false);
     this.onTouched();
     this.validateSelf();
     
     setTimeout(() => {
-      if (!this.isFocused) {
+      if (!this.isFocused()) {
         this.closeSuggestions();
       }
     }, 200);
   }
 
   clearValue(): void {
-    this.inputValue = '';
+    this.inputValue.set('');
     this.propagateChanges();
     this.updateSuggestionsState('');
     this.phoneInput()?.nativeElement.focus();
   }
 
   isValid(): boolean {
-    if (!this.enableValidation()) return true;
+    if (!this.validationEnabled()) return true;
     const activeCountry = this.selectedCountry();
-    if (!activeCountry || !this.inputValue) return false;
-    return this.phoneService.isValidNumber(this.inputValue, activeCountry.code);
+    if (!activeCountry || !this.inputValue()) return false;
+    return this.phoneService.isValidNumber(this.inputValue(), activeCountry.code);
   }
 
   private validateSelf(): void {
-    const isSearchQuery = this.allowAlphanumeric() && /[a-zA-Z]/.test(this.inputValue);
-    if (this.inputValue && !isSearchQuery && !this.isValid()) {
-      this.hasError = true;
+    const isSearchQuery = this.contactSearchEnabled() && /[a-zA-Z]/.test(this.inputValue());
+    if (this.inputValue() && !isSearchQuery && !this.isValid()) {
+      this.hasError.set(true);
     } else {
-      this.hasError = false;
+      this.hasError.set(false);
     }
   }
 
@@ -679,16 +564,22 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     this.validateSelf();
     const activeCountry = this.selectedCountry();
 
-    if (!this.inputValue || !activeCountry) {
+    if (!this.inputValue() || !activeCountry) {
       this.onChange(null);
       this.valueChange.emit(null);
       return;
     }
 
-    const valueObject = this.phoneService.parsePhoneNumber(this.inputValue, activeCountry);
-    const outputValue = this.valueFormat() === 'object' 
+    if (this.suggestionsEnabled() && /[a-zA-Z]/.test(this.inputValue())) {
+      this.onChange(null);
+      this.valueChange.emit(null);
+      return;
+    }
+
+    const valueObject = this.phoneService.parsePhoneNumber(this.inputValue(), activeCountry);
+    const outputValue = this.outputFormat() === 'object' 
       ? valueObject 
-      : (this.isValid() ? this.phoneService.formatE164(this.inputValue, activeCountry.code) : this.inputValue);
+      : (this.isValid() ? this.phoneService.formatE164(this.inputValue(), activeCountry.code) : this.inputValue());
 
     this.onChange(outputValue);
     this.valueChange.emit(outputValue);
@@ -707,18 +598,38 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     return 320;
   }
 
+  get countryListboxId(): string {
+    return `${this.inputId()}-countries-listbox`;
+  }
+
+  get suggestionsListboxId(): string {
+    return `${this.inputId()}-suggestions-listbox`;
+  }
+
+  get activeSuggestionId(): string | null {
+    if (!this.showSuggestions() || !this.suggestions()[this.activeSuggestionIndex()]) return null;
+    return `${this.inputId()}-suggestion-${this.activeSuggestionIndex()}`;
+  }
+
+  getFlagUrl(countryCode: string): string {
+    return this.flagUrl()?.(countryCode) ?? `https://flagcdn.com/${countryCode.toLowerCase()}.svg`;
+  }
+
   // --- ControlValueAccessor ---
 
-  writeValue(value: any): void {
+  writeValue(value: unknown): void {
     if (!value) {
-      this.inputValue = '';
+      this.inputValue.set('');
+      this.selectedCountry.set(this.getDefaultCountry());
+      this.suggestedCountry.set(null);
       this.validateSelf();
       return;
     }
 
-    if (typeof value === 'object') {
-      const countryCode = value.countryCode || value.code;
-      const numberToFormat = value.number || value.formattedNumber || '';
+    if (typeof value === 'object' && value !== null) {
+      const phoneValue = value as Partial<PhoneNumberValue> & { code?: string };
+      const countryCode = phoneValue.countryCode || phoneValue.code;
+      const numberToFormat = phoneValue.number || phoneValue.formattedNumber || '';
 
       if (countryCode) {
         const found = this.phoneService.getStaticCountries().find(
@@ -727,7 +638,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
         if (found) {
           this.selectedCountry.set(found);
           const rawDigits = numberToFormat.replace(/\D/g, '');
-          this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, found.code);
+          this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, found.code));
           this.validateSelf();
           return;
         }
@@ -740,7 +651,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
         this.selectedCountry.set(detected);
         const cleanInput = value.replace(detected.dialCode, '').replace('+', '');
         const rawDigits = cleanInput.replace(/\D/g, '');
-        this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, detected.code);
+        this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, detected.code));
         this.validateSelf();
         return;
       }
@@ -749,14 +660,14 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     const currentCountry = this.selectedCountry();
     if (currentCountry) {
       const rawDigits = String(value).replace(/\D/g, '');
-      this.inputValue = this.phoneService.formatPhoneNumber(rawDigits, currentCountry.code);
+      this.inputValue.set(this.phoneService.formatPhoneNumber(rawDigits, currentCountry.code));
     } else {
-      this.inputValue = String(value);
+      this.inputValue.set(String(value));
     }
     this.validateSelf();
   }
 
-  registerOnChange(fn: (value: any) => void): void {
+  registerOnChange(fn: (value: PhoneInputValue) => void): void {
     this.onChange = fn;
   }
 
@@ -764,8 +675,13 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     this.onTouched = fn;
   }
 
+  registerOnValidatorChange(fn: () => void): void {
+    this.onValidatorChange = fn;
+    fn();
+  }
+
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.disabled.set(isDisabled);
   }
 
   // --- Validator ---

@@ -1,9 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, of, throwError } from 'rxjs';
 import * as lpn from 'google-libphonenumber';
 import intlTelInput from 'intl-tel-input';
-import { Country, PhoneNumberValue } from './ng-tel-input-autocomplete.types';
+import {
+  CountrySearchResponse,
+  Country,
+  PhoneNumberValue
+} from './ng-tel-input-autocomplete.types';
 import { COUNTRIES } from './countries-data';
 
 @Injectable({
@@ -75,11 +79,15 @@ export class NgTelInputAutocompleteService {
     }
   }
 
-  searchCountries(query: string, page = 1, limit = 10, apiUrl: string | null = null): Observable<{ data: Country[], meta: { page: number; limit: number; total: number; hasMore: boolean } }> {
+  searchCountries(
+    query: string,
+    page = 1,
+    limit = 10,
+    apiUrl: string | null = null
+  ): Observable<CountrySearchResponse> {
     const staticCountries = this.getStaticCountries();
 
-    // Fallback if API URL is not provided, or HTTP Client / Express API is not available
-    if (!apiUrl || !this.http || typeof window === 'undefined') {
+    if (!apiUrl || typeof window === 'undefined') {
       const filtered = staticCountries.filter(c => 
         c.name.toLowerCase().includes(query.toLowerCase()) || 
         c.dialCode.includes(query) || 
@@ -97,12 +105,21 @@ export class NgTelInputAutocompleteService {
       });
     }
 
+    if (!this.http) {
+      return throwError(
+        () =>
+          new Error(
+            'NgTelInputAutocomplete requires provideHttpClient() when countrySearchUrl is configured.'
+          )
+      );
+    }
+
     const params = new HttpParams()
       .set('q', query)
       .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.http.get<{ data: Country[], meta: { page: number; limit: number; total: number; hasMore: boolean } }>(apiUrl, { params }).pipe(
+    return this.http.get<CountrySearchResponse>(apiUrl, { params }).pipe(
       map(response => {
         if (!response || !response.data) {
           return { data: [], meta: { page, limit, total: 0, hasMore: false } };
