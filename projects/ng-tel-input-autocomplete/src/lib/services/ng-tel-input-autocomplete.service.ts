@@ -6,22 +6,23 @@ import intlTelInput from 'intl-tel-input';
 import {
   CountrySearchResponse,
   Country,
-  PhoneNumberValue
+  PhoneNumberValue,
 } from '../models/ng-tel-input-autocomplete.types';
 import { COUNTRIES } from '../data/countries-data';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NgTelInputAutocompleteService {
-  private http = inject(HttpClient, { optional: true });
+  private readonly http = inject(HttpClient, { optional: true });
   private readonly phoneUtil = lpn.PhoneNumberUtil.getInstance();
+  private cachedCountries: Country[] | null = null;
 
   private getFlagEmoji(countryCode: string): string {
     const codePoints = countryCode
       .toUpperCase()
       .split('')
-      .map(char => 127397 + char.charCodeAt(0));
+      .map((char) => 127397 + char.charCodeAt(0));
     try {
       return String.fromCodePoint(...codePoints);
     } catch {
@@ -33,12 +34,18 @@ export class NgTelInputAutocompleteService {
    * Expose local fallback list of countries enriched from intl-tel-input
    */
   getStaticCountries(): Country[] {
+    if (this.cachedCountries) {
+      return this.cachedCountries;
+    }
+
     try {
       const rawList = intlTelInput.getAllCountries();
       if (!rawList || rawList.length === 0) {
-        return COUNTRIES;
+        this.cachedCountries = COUNTRIES;
+        return this.cachedCountries;
       }
-      return rawList.map(c => {
+
+      this.cachedCountries = rawList.map((c) => {
         const codeUpper = c.iso2.toUpperCase();
         let name = c.name;
         if (!name) {
@@ -71,11 +78,13 @@ export class NgTelInputAutocompleteService {
           dialCode: `+${c.dialCode}`,
           flag: this.getFlagEmoji(c.iso2),
           format: '', // Managed live by AsYouTypeFormatter
-          placeholder: placeholder
+          placeholder: placeholder,
         };
       });
+      return this.cachedCountries;
     } catch {
-      return COUNTRIES;
+      this.cachedCountries = COUNTRIES;
+      return this.cachedCountries;
     }
   }
 
@@ -83,15 +92,16 @@ export class NgTelInputAutocompleteService {
     query: string,
     page = 1,
     limit = 10,
-    apiUrl: string | null = null
+    apiUrl: string | null = null,
   ): Observable<CountrySearchResponse> {
     const staticCountries = this.getStaticCountries();
 
     if (!apiUrl || typeof window === 'undefined') {
-      const filtered = staticCountries.filter(c => 
-        c.name.toLowerCase().includes(query.toLowerCase()) || 
-        c.dialCode.includes(query) || 
-        c.code.toLowerCase().includes(query.toLowerCase())
+      const filtered = staticCountries.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query.toLowerCase()) ||
+          c.dialCode.includes(query) ||
+          c.code.toLowerCase().includes(query.toLowerCase()),
       );
       const offset = (page - 1) * limit;
       return of({
@@ -100,8 +110,8 @@ export class NgTelInputAutocompleteService {
           page,
           limit,
           total: filtered.length,
-          hasMore: offset + limit < filtered.length
-        }
+          hasMore: offset + limit < filtered.length,
+        },
       });
     }
 
@@ -109,8 +119,8 @@ export class NgTelInputAutocompleteService {
       return throwError(
         () =>
           new Error(
-            'NgTelInputAutocomplete requires provideHttpClient() when countrySearchUrl is configured.'
-          )
+            'NgTelInputAutocomplete requires provideHttpClient() when countrySearchUrl is configured.',
+          ),
       );
     }
 
@@ -120,12 +130,12 @@ export class NgTelInputAutocompleteService {
       .set('limit', limit.toString());
 
     return this.http.get<CountrySearchResponse>(apiUrl, { params }).pipe(
-      map(response => {
+      map((response) => {
         if (!response || !response.data) {
           return { data: [], meta: { page, limit, total: 0, hasMore: false } };
         }
         return response;
-      })
+      }),
     );
   }
 
@@ -154,7 +164,7 @@ export class NgTelInputAutocompleteService {
   parsePhoneNumber(input: string, country: Country): PhoneNumberValue {
     const rawDigits = input.replace(/\D/g, '');
     const formatted = this.formatPhoneNumber(rawDigits, country.code);
-    
+
     try {
       let parseInput = input;
       if (!input.startsWith('+') && !input.startsWith(country.dialCode)) {
@@ -162,14 +172,17 @@ export class NgTelInputAutocompleteService {
       }
       const parsed = this.phoneUtil.parseAndKeepRawInput(parseInput, country.code.toUpperCase());
       const formattedNational = this.phoneUtil.format(parsed, lpn.PhoneNumberFormat.NATIONAL);
-      const formattedInternational = this.phoneUtil.format(parsed, lpn.PhoneNumberFormat.INTERNATIONAL);
-      
+      const formattedInternational = this.phoneUtil.format(
+        parsed,
+        lpn.PhoneNumberFormat.INTERNATIONAL,
+      );
+
       return {
         countryCode: country.code,
         dialCode: country.dialCode,
         number: parsed.getNationalNumber()?.toString() || rawDigits,
         formattedNumber: formattedNational,
-        fullNumber: formattedInternational
+        fullNumber: formattedInternational,
       };
     } catch {
       return {
@@ -177,7 +190,7 @@ export class NgTelInputAutocompleteService {
         dialCode: country.dialCode,
         number: rawDigits,
         formattedNumber: formatted,
-        fullNumber: `${country.dialCode} ${formatted}`.trim()
+        fullNumber: `${country.dialCode} ${formatted}`.trim(),
       };
     }
   }
@@ -193,14 +206,18 @@ export class NgTelInputAutocompleteService {
       const parsed = this.phoneUtil.parse('+' + cleaned);
       const countryCode = this.phoneUtil.getRegionCodeForNumber(parsed);
       if (countryCode) {
-        const found = this.getStaticCountries().find(c => c.code.toUpperCase() === countryCode.toUpperCase());
+        const found = this.getStaticCountries().find(
+          (c) => c.code.toUpperCase() === countryCode.toUpperCase(),
+        );
         if (found) return found;
       }
     } catch {
       // ignore
     }
 
-    const countries = this.getStaticCountries().sort((a, b) => b.dialCode.length - a.dialCode.length);
+    const countries = [...this.getStaticCountries()].sort(
+      (a, b) => b.dialCode.length - a.dialCode.length,
+    );
     for (const country of countries) {
       const targetDial = country.dialCode.replace('+', '');
       if (cleaned.startsWith(targetDial)) {
@@ -219,12 +236,17 @@ export class NgTelInputAutocompleteService {
       if (!phoneNumber || !countryCode) return false;
       let checkInput = phoneNumber;
       if (!phoneNumber.startsWith('+')) {
-        const staticC = this.getStaticCountries().find(c => c.code.toUpperCase() === countryCode.toUpperCase());
+        const staticC = this.getStaticCountries().find(
+          (c) => c.code.toUpperCase() === countryCode.toUpperCase(),
+        );
         if (staticC) {
           checkInput = `${staticC.dialCode}${phoneNumber.replace(/\D/g, '')}`;
         }
       }
-      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(checkInput, countryCode.toUpperCase());
+      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(
+        checkInput,
+        countryCode.toUpperCase(),
+      );
       return this.phoneUtil.isValidNumber(parsedNumber);
     } catch {
       return false;
@@ -237,7 +259,10 @@ export class NgTelInputAutocompleteService {
   formatE164(phoneNumber: string, countryCode: string): string {
     try {
       if (!phoneNumber || !countryCode) return phoneNumber;
-      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(phoneNumber, countryCode.toUpperCase());
+      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(
+        phoneNumber,
+        countryCode.toUpperCase(),
+      );
       return this.phoneUtil.format(parsedNumber, lpn.PhoneNumberFormat.E164);
     } catch {
       return phoneNumber;
@@ -250,7 +275,10 @@ export class NgTelInputAutocompleteService {
   formatNational(phoneNumber: string, countryCode: string): string {
     try {
       if (!phoneNumber || !countryCode) return phoneNumber;
-      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(phoneNumber, countryCode.toUpperCase());
+      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(
+        phoneNumber,
+        countryCode.toUpperCase(),
+      );
       return this.phoneUtil.format(parsedNumber, lpn.PhoneNumberFormat.NATIONAL);
     } catch {
       return phoneNumber;
@@ -263,7 +291,10 @@ export class NgTelInputAutocompleteService {
   formatInternational(phoneNumber: string, countryCode: string): string {
     try {
       if (!phoneNumber || !countryCode) return phoneNumber;
-      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(phoneNumber, countryCode.toUpperCase());
+      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(
+        phoneNumber,
+        countryCode.toUpperCase(),
+      );
       return this.phoneUtil.format(parsedNumber, lpn.PhoneNumberFormat.INTERNATIONAL);
     } catch {
       return phoneNumber;
@@ -283,7 +314,10 @@ export class NgTelInputAutocompleteService {
     if (!sanitizedQuery) return escapedText;
 
     const regex = new RegExp(`(${sanitizedQuery})`, 'gi');
-    return escapedText.replace(regex, '<strong class="text-blue-600 font-bold bg-blue-100/80 px-0.5 rounded">$1</strong>');
+    return escapedText.replace(
+      regex,
+      '<strong class="text-blue-600 font-bold bg-blue-100/80 px-0.5 rounded">$1</strong>',
+    );
   }
 
   private escapeHtml(text: string): string {

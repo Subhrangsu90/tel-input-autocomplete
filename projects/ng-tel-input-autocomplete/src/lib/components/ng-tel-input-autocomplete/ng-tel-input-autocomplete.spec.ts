@@ -69,9 +69,8 @@ describe('NgTelInputAutocomplete', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NgTelInputAutocomplete]
-    })
-    .compileComponents();
+      imports: [NgTelInputAutocomplete],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NgTelInputAutocomplete);
     component = fixture.componentInstance;
@@ -117,7 +116,9 @@ describe('NgTelInputAutocomplete', () => {
 
   it('should expose combobox semantics and an accessible country listbox', async () => {
     const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
-    const trigger = fixture.nativeElement.querySelector('.country-trigger') as HTMLButtonElement;
+    const trigger = fixture.nativeElement.querySelector(
+      '.ngti-country-trigger',
+    ) as HTMLButtonElement;
 
     expect(input.getAttribute('role')).toBe('combobox');
     expect(input.getAttribute('aria-label')).toBe('International phone number');
@@ -127,23 +128,28 @@ describe('NgTelInputAutocomplete', () => {
     await fixture.whenStable();
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    expect(document.querySelector('[role="listbox"]')?.getAttribute('aria-label')).toBe('Countries');
+    expect(document.querySelector('[role="listbox"]')?.getAttribute('aria-label')).toBe(
+      'Countries',
+    );
   });
 
   it('should generate unique IDs for separate component instances', async () => {
     const secondFixture = TestBed.createComponent(NgTelInputAutocomplete);
     await secondFixture.whenStable();
 
-    const firstId = (fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement).id;
-    const secondId = (secondFixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement).id;
+    const firstId = (fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement)
+      .id;
+    const secondId = (
+      secondFixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement
+    ).id;
 
     expect(firstId).not.toBe(secondId);
     secondFixture.destroy();
   });
 
   it('should use offline emoji flags by default', () => {
-    expect(fixture.nativeElement.querySelector('.flag-emoji')?.textContent?.trim()).toBe('🇺🇸');
-    expect(fixture.nativeElement.querySelector('img.flag-image')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.ngti-flag-emoji')?.textContent?.trim()).toBe('🇺🇸');
+    expect(fixture.nativeElement.querySelector('img.ngti-flag-image')).toBeNull();
   });
 
   it('should show the selected country example number as the default placeholder', async () => {
@@ -180,7 +186,9 @@ describe('NgTelInputAutocomplete', () => {
     await fixture.whenStable();
 
     const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
-    const trigger = fixture.nativeElement.querySelector('.country-trigger') as HTMLButtonElement;
+    const trigger = fixture.nativeElement.querySelector(
+      '.ngti-country-trigger',
+    ) as HTMLButtonElement;
 
     expect(input.getAttribute('name')).toBe('workPhone');
     expect(input.getAttribute('autocomplete')).toBe('tel-national');
@@ -200,7 +208,7 @@ describe('NgTelInputAutocomplete', () => {
 
     component.inputValue.set('123');
     await fixture.whenStable();
-    expect(fixture.nativeElement.querySelector('.clear-button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.ngti-clear-button')).toBeNull();
 
     component.toggleOverlay(new MouseEvent('click'));
     expect(component.isOpen()).toBe(false);
@@ -227,10 +235,10 @@ describe('NgTelInputAutocomplete', () => {
     component.isOpen.set(true);
     await fixture.whenStable();
 
-    const shell = fixture.nativeElement.querySelector('.input-shell') as HTMLElement;
-    const trigger = fixture.nativeElement.querySelector('.country-trigger') as HTMLElement;
+    const shell = fixture.nativeElement.querySelector('.ngti-input-shell') as HTMLElement;
+    const trigger = fixture.nativeElement.querySelector('.ngti-country-trigger') as HTMLElement;
     const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
-    const actions = fixture.nativeElement.querySelector('.actions') as HTMLElement;
+    const actions = fixture.nativeElement.querySelector('.ngti-actions') as HTMLElement;
     const dropdown = document.querySelector('.custom-dropdown') as HTMLElement;
 
     expect(shell.classList.contains('custom-shell')).toBe(true);
@@ -279,7 +287,9 @@ describe('NgTelInputAutocomplete', () => {
     const clear = vi.fn();
     const lazyLoad = vi.fn();
 
-    fixture.componentRef.setInput('suggestions', [{ name: 'Asha', phoneNumber: '+919876543210', countryCode: 'IN' }]);
+    fixture.componentRef.setInput('suggestions', [
+      { name: 'Asha', phoneNumber: '+919876543210', countryCode: 'IN' },
+    ]);
     component.completeMethod.subscribe(completeMethod);
     component.inputFocus.subscribe(inputFocus);
     component.inputBlur.subscribe(inputBlur);
@@ -302,7 +312,9 @@ describe('NgTelInputAutocomplete', () => {
     expect(completeMethod).toHaveBeenCalledWith(expect.objectContaining({ query: 'Asha' }));
     expect(inputKeydown).toHaveBeenCalledWith(expect.objectContaining({ key: 'ArrowDown' }));
     expect(inputKeyup).toHaveBeenCalledWith(expect.objectContaining({ key: 'a' }));
-    expect(lazyLoad).toHaveBeenCalledWith(expect.objectContaining({ type: 'suggestions', query: 'Asha' }));
+    expect(lazyLoad).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'suggestions', query: 'Asha' }),
+    );
     expect(clear).toHaveBeenCalled();
     expect(inputBlur).toHaveBeenCalled();
   });
@@ -327,11 +339,17 @@ describe('NgTelInputAutocomplete', () => {
     component.onCountrySelected(component.countries()[1]);
     component.selectSuggestion({ name: 'Asha', phoneNumber: '+919876543210', countryCode: 'IN' });
 
-    expect(dropdownClick).toHaveBeenCalledWith(expect.objectContaining({ originalEvent: clickEvent, open: true }));
+    expect(dropdownClick).toHaveBeenCalledWith(
+      expect.objectContaining({ originalEvent: clickEvent, open: true }),
+    );
     expect(overlayShow).toHaveBeenCalledWith({ type: 'countries' });
     expect(overlayHide).toHaveBeenCalledWith({ type: 'countries' });
-    expect(countrySelect).toHaveBeenCalledWith(expect.objectContaining({ country: component.countries()[1] }));
-    expect(suggestionSelect).toHaveBeenCalledWith(expect.objectContaining({ suggestion: expect.objectContaining({ name: 'Asha' }) }));
+    expect(countrySelect).toHaveBeenCalledWith(
+      expect.objectContaining({ country: component.countries()[1] }),
+    );
+    expect(suggestionSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestion: expect.objectContaining({ name: 'Asha' }) }),
+    );
   });
 
   it('should support reactive forms value writes, validation, touched state, and disabling', async () => {

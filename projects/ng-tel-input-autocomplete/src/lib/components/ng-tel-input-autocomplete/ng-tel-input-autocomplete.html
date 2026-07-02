@@ -38,7 +38,12 @@
         />
       } @else {
         @if (flagMode() === 'image') {
-          <img class="ngti-flag-image" [src]="getFlagUrl(country.code)" alt="" referrerpolicy="no-referrer" />
+          <img
+            class="ngti-flag-image"
+            [src]="getFlagUrl(country.code)"
+            alt=""
+            referrerpolicy="no-referrer"
+          />
         } @else {
           <span class="ngti-flag-emoji" aria-hidden="true">{{ country.flag }}</span>
         }
@@ -98,21 +103,14 @@
 
   <div class="ngti-actions" [ngClass]="actionsClass()" [ngStyle]="actionsStyle()">
     @if (showClear() && inputValue() && !isDisabled() && !isReadOnly()) {
-      <button type="button" class="ngti-clear-button" aria-label="Clear phone number" (click)="clearValue()">
+      <button
+        type="button"
+        class="ngti-clear-button"
+        aria-label="Clear phone number"
+        (click)="clearValue()"
+      >
         <lib-tel-icon name="close" aria-hidden="true" />
       </button>
-    }
-
-    @if (validationEnabled()) {
-      @if (isInvalid()) {
-        <span class="ngti-status-icon ngti-is-invalid" title="Invalid phone number">
-          <lib-tel-icon name="error" aria-hidden="true" />
-        </span>
-      } @else if (inputValue() && isValid()) {
-        <span class="ngti-status-icon ngti-fade-in" title="Valid phone number">
-          <lib-tel-icon name="check" aria-hidden="true" />
-        </span>
-      }
     }
   </div>
 </div>
@@ -126,11 +124,18 @@
     <div class="ngti-detection ngti-fade-in">
       <span class="ngti-detection-copy">
         @if (flagMode() === 'image') {
-          <img class="ngti-flag-image ngti-size-small" [src]="getFlagUrl(suggested.code)" alt="" referrerpolicy="no-referrer" />
+          <img
+            class="ngti-flag-image ngti-size-small"
+            [src]="getFlagUrl(suggested.code)"
+            alt=""
+            referrerpolicy="no-referrer"
+          />
         } @else {
           <span aria-hidden="true">{{ suggested.flag }}</span>
         }
-        <span>Detected: <strong>{{ suggested.name }}</strong> ({{ suggested.dialCode }})</span>
+        <span
+          >Detected: <strong>{{ suggested.name }}</strong> ({{ suggested.dialCode }})</span
+        >
       </span>
       <button type="button" class="ngti-switch-button" (click)="selectSuggestedCountry()">
         Switch country
