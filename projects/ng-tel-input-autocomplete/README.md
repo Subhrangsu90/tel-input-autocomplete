@@ -110,11 +110,37 @@ Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validatio
 | `allowedCountries` | `readonly string[]` | `[]` | Restrict the country list |
 | `excludedCountries` | `readonly string[]` | `[]` | Remove countries from the list |
 | `outputFormat` | `string \| object` | `string` | Form/output value representation |
-| `placeholder` | `string` | `Enter phone number...` | Input placeholder |
+| `name` | `string \| null` | `null` | Native input name |
+| `autocomplete` | `string` | `tel` | Browser autofill hint |
+| `inputMode` | `string` | `tel` | Mobile keyboard hint |
+| `enterKeyHint` | `string \| null` | `null` | Mobile enter key hint |
+| `pattern` | `string \| null` | `null` | Native pattern attribute |
+| `minLength` | `number \| null` | `null` | Native minimum length |
+| `maxLength` | `number \| null` | `null` | Native maximum length |
+| `min` | `number \| null` | `null` | Native minimum value attribute |
+| `max` | `number \| null` | `null` | Native maximum value attribute |
+| `step` | `number \| 'any' \| null` | `null` | Native step attribute |
+| `inputSize` | `number \| null` | `null` | Visible input width in characters |
+| `readOnly` | `boolean` | `false` | Prevent user edits while allowing form writes |
+| `readonly` | `boolean` | `false` | Alias for `readOnly` |
+| `required` | `boolean` | `false` | Native required attribute |
+| `spellcheck` | `boolean` | `false` | Native spellcheck attribute |
+| `disabled` | `boolean` | `false` | Disable without Angular Forms |
+| `invalid` | `boolean` | `false` | Force invalid visual and ARIA state |
+| `ariaDescribedBy` | `string \| null` | `null` | Extra `aria-describedby` IDs |
+| `ariaLabelledBy` | `string \| null` | `null` | External label IDs for `aria-labelledby` |
+| `placeholder` | `string \| null` | `null` | Custom input placeholder; selected country example number is shown by default |
 | `countrySearchUrl` | `string \| null` | `null` | Optional paginated country endpoint |
 | `suggestionsEnabled` | `boolean` | `true` | Enable external contact suggestions |
 | `contactSearchEnabled` | `boolean` | `true` | Permit contact-name search text |
 | `validationEnabled` | `boolean` | `true` | Enable phone validation |
+| `minQueryLength` | `number \| null` | `null` | Minimum query length before suggestion search |
+| `delay` | `number \| null` | `null` | Country search debounce in milliseconds |
+| `completeOnFocus` | `boolean` | `true` | Search suggestions on input focus |
+| `showClear` | `boolean` | `true` | Show the clear button when the input has a value |
+| `fluid` | `boolean` | `false` | Full-width styling hook |
+| `variant` | `filled \| outlined` | `outlined` | Input shell variant |
+| `size` | `small \| large \| null` | `null` | Compact or large input sizing |
 | `suggestions` | `readonly PhoneSuggestion[]` | `[]` | Current suggestion page |
 | `suggestionsLoading` | `boolean` | `false` | Show suggestion loading state |
 | `suggestionsExhausted` | `boolean` | `false` | Prevent further `loadMoreSuggestions` events |
@@ -125,16 +151,47 @@ Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validatio
 | `suggestionTemplate` | `TemplateRef<SuggestionTemplateContext> \| null` | `null` | Custom suggestion option content |
 | `emptyTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Custom empty state |
 | `loadingTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Custom loading state |
+| `containerClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the outer input shell. |
+| `containerStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the outer input shell. |
+| `countryButtonClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the country trigger button. |
+| `countryButtonStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the country trigger button. |
+| `inputClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the native telephone input. |
+| `inputStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the native telephone input. |
+| `actionsClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the clear/status actions container. |
+| `actionsStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the clear/status actions container. |
+| `dropdownClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to country and suggestion dropdown panels. |
+| `dropdownStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to country and suggestion dropdown panels. |
 
 ## Outputs
 
 | Output | Payload | Purpose |
 | --- | --- | --- |
 | `suggestionSearch` | `string` | Request contact suggestions |
+| `completeMethod` | `AutoCompleteCompleteEvent` | PrimeNG-style typed search event |
 | `loadMoreSuggestions` | `void` | Request another suggestion page |
 | `valueChange` | `string \| PhoneNumberValue \| null` | Observe values without Angular Forms |
 | `countryLoadError` | `unknown` | Handle country endpoint failures |
+| `suggestionSelect` | `AutoCompleteSelectEvent` | React when a contact suggestion is selected |
+| `countrySelect` | `CountrySelectEvent` | React when a country is selected |
+| `inputFocus` / `inputBlur` | `Event` | React to native input focus changes |
+| `dropdownClick` | `AutoCompleteDropdownClickEvent` | React when the country trigger is clicked |
+| `clear` | `void` | React when the clear button resets the value |
+| `inputKeydown` / `inputKeyup` | `KeyboardEvent` | React to input keyboard events |
+| `overlayShow` / `overlayHide` | `AutoCompleteOverlayEvent` | React when country or suggestion overlays open/close |
+| `lazyLoad` | `AutoCompleteLazyLoadEvent` | React to country/suggestion infinite-scroll requests |
 
+## Styling
+
+Use the class/style inputs to customize the built-in UI while keeping the component behavior and accessibility intact.
+
+```html
+<ng-tel-input-autocomplete
+  containerClass="rounded-phone"
+  [containerStyle]="{ borderColor: '#2563eb' }"
+  inputClass="phone-text"
+  [dropdownStyle]="{ maxHeight: '18rem' }"
+/>
+```
 ## Country API
 
 Call `provideHttpClient()` in the application when `countrySearchUrl` is used:

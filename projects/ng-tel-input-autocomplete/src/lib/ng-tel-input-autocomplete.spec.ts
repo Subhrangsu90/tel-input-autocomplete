@@ -130,6 +130,107 @@ describe('NgTelInputAutocomplete', () => {
     expect(fixture.nativeElement.querySelector('img.flag-image')).toBeNull();
   });
 
+  it('should show the selected country example number as the default placeholder', async () => {
+    const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
+
+    expect(input.placeholder).toBe(component.selectedCountry()?.placeholder);
+
+    fixture.componentRef.setInput('defaultCountry', 'IN');
+    await fixture.whenStable();
+
+    expect(input.placeholder).toBe(component.selectedCountry()?.placeholder);
+  });
+
+  it('should let a custom placeholder override the selected country example number', async () => {
+    fixture.componentRef.setInput('placeholder', 'Search phone or contact...');
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
+    expect(input.placeholder).toBe('Search phone or contact...');
+  });
+  it('should pass native input attributes and readonly state to the rendered input', async () => {
+    fixture.componentRef.setInput('name', 'workPhone');
+    fixture.componentRef.setInput('autocomplete', 'tel-national');
+    fixture.componentRef.setInput('inputMode', 'numeric');
+    fixture.componentRef.setInput('enterKeyHint', 'done');
+    fixture.componentRef.setInput('pattern', '[0-9]+');
+    fixture.componentRef.setInput('minLength', 4);
+    fixture.componentRef.setInput('maxLength', 20);
+    fixture.componentRef.setInput('readOnly', true);
+    fixture.componentRef.setInput('required', true);
+    fixture.componentRef.setInput('spellcheck', true);
+    fixture.componentRef.setInput('ariaDescribedBy', 'phone-help');
+    fixture.componentRef.setInput('ariaLabelledBy', 'phone-label');
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
+    const trigger = fixture.nativeElement.querySelector('.country-trigger') as HTMLButtonElement;
+
+    expect(input.getAttribute('name')).toBe('workPhone');
+    expect(input.getAttribute('autocomplete')).toBe('tel-national');
+    expect(input.getAttribute('inputmode')).toBe('numeric');
+    expect(input.getAttribute('enterkeyhint')).toBe('done');
+    expect(input.getAttribute('pattern')).toBe('[0-9]+');
+    expect(input.getAttribute('minlength')).toBe('4');
+    expect(input.getAttribute('maxlength')).toBe('20');
+    expect(input.readOnly).toBe(true);
+    expect(input.required).toBe(true);
+    expect(input.getAttribute('spellcheck')).toBe('true');
+    expect(input.getAttribute('aria-label')).toBeNull();
+    expect(input.getAttribute('aria-labelledby')).toBe('phone-label');
+    expect(input.getAttribute('aria-describedby')).toBe('phone-help');
+    expect(input.getAttribute('aria-readonly')).toBe('true');
+    expect(trigger.disabled).toBe(true);
+
+    component.inputValue.set('123');
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('.clear-button')).toBeNull();
+
+    component.toggleOverlay(new MouseEvent('click'));
+    expect(component.isOpen()).toBe(false);
+
+    component.hasError.set(true);
+    await fixture.whenStable();
+    expect(input.getAttribute('aria-describedby')).toBe(`phone-help ${component.inputId()}-error`);
+
+    component.writeValue('+12025550143');
+    await fixture.whenStable();
+    expect(component.inputValue()).toContain('202');
+  });
+  it('should apply custom class and style inputs to rendered parts', async () => {
+    fixture.componentRef.setInput('containerClass', 'custom-shell');
+    fixture.componentRef.setInput('containerStyle', { borderRadius: '4px' });
+    fixture.componentRef.setInput('countryButtonClass', 'custom-trigger');
+    fixture.componentRef.setInput('countryButtonStyle', { color: 'rgb(12, 34, 56)' });
+    fixture.componentRef.setInput('inputClass', ['custom-input']);
+    fixture.componentRef.setInput('inputStyle', { backgroundColor: 'rgb(250, 250, 250)' });
+    fixture.componentRef.setInput('actionsClass', { 'custom-actions': true });
+    fixture.componentRef.setInput('actionsStyle', { paddingRight: '12px' });
+    fixture.componentRef.setInput('dropdownClass', 'custom-dropdown');
+    fixture.componentRef.setInput('dropdownStyle', { maxHeight: '12rem' });
+    component.isOpen.set(true);
+    await fixture.whenStable();
+
+    const shell = fixture.nativeElement.querySelector('.input-shell') as HTMLElement;
+    const trigger = fixture.nativeElement.querySelector('.country-trigger') as HTMLElement;
+    const input = fixture.nativeElement.querySelector('input[type="tel"]') as HTMLInputElement;
+    const actions = fixture.nativeElement.querySelector('.actions') as HTMLElement;
+    const dropdown = document.querySelector('.custom-dropdown') as HTMLElement;
+
+    expect(shell.classList.contains('custom-shell')).toBe(true);
+    expect(shell.style.borderRadius).toBe('4px');
+    expect(trigger.classList.contains('custom-trigger')).toBe(true);
+    expect(trigger.style.color).toBe('rgb(12, 34, 56)');
+    expect(input.classList.contains('custom-input')).toBe(true);
+    expect(input.style.backgroundColor).toBe('rgb(250, 250, 250)');
+    expect(actions.classList.contains('custom-actions')).toBe(true);
+    expect(actions.style.paddingRight).toBe('12px');
+    expect(dropdown.style.maxHeight).toBe('12rem');
+
+    component.isOpen.set(false);
+    await fixture.whenStable();
+  });
+
   it('should emit null form values while alphabetic contact search text is entered', () => {
     const onChange = vi.fn();
     component.registerOnChange(onChange);
@@ -151,6 +252,70 @@ describe('NgTelInputAutocomplete', () => {
     const emitted = onChange.mock.lastCall?.[0] as PhoneNumberValue;
     expect(emitted.countryCode).toBe('US');
     expect(emitted.number).toBe('2025550143');
+  });
+
+  it('should emit complete, focus, blur, key, clear, and lazy-load events', async () => {
+    const completeMethod = vi.fn();
+    const inputFocus = vi.fn();
+    const inputBlur = vi.fn();
+    const inputKeydown = vi.fn();
+    const inputKeyup = vi.fn();
+    const clear = vi.fn();
+    const lazyLoad = vi.fn();
+
+    fixture.componentRef.setInput('suggestions', [{ name: 'Asha', phoneNumber: '+919876543210', countryCode: 'IN' }]);
+    component.completeMethod.subscribe(completeMethod);
+    component.inputFocus.subscribe(inputFocus);
+    component.inputBlur.subscribe(inputBlur);
+    component.inputKeydown.subscribe(inputKeydown);
+    component.inputKeyup.subscribe(inputKeyup);
+    component.clear.subscribe(clear);
+    component.lazyLoad.subscribe(lazyLoad);
+    await fixture.whenStable();
+
+    const inputEvent = new Event('input');
+    component.onFocus(new FocusEvent('focus'));
+    component.onInputChange({ ...inputEvent, target: { value: 'Asha' } } as unknown as Event);
+    component.handleInputKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    component.handleInputKeyUp(new KeyboardEvent('keyup', { key: 'a' }));
+    component.onLoadMoreSuggestions();
+    component.clearValue();
+    component.onBlur(new FocusEvent('blur'));
+
+    expect(inputFocus).toHaveBeenCalled();
+    expect(completeMethod).toHaveBeenCalledWith(expect.objectContaining({ query: 'Asha' }));
+    expect(inputKeydown).toHaveBeenCalledWith(expect.objectContaining({ key: 'ArrowDown' }));
+    expect(inputKeyup).toHaveBeenCalledWith(expect.objectContaining({ key: 'a' }));
+    expect(lazyLoad).toHaveBeenCalledWith(expect.objectContaining({ type: 'suggestions', query: 'Asha' }));
+    expect(clear).toHaveBeenCalled();
+    expect(inputBlur).toHaveBeenCalled();
+  });
+
+  it('should emit select, dropdown click, and overlay lifecycle events', async () => {
+    const suggestionSelect = vi.fn();
+    const countrySelect = vi.fn();
+    const dropdownClick = vi.fn();
+    const overlayShow = vi.fn();
+    const overlayHide = vi.fn();
+
+    component.suggestionSelect.subscribe(suggestionSelect);
+    component.countrySelect.subscribe(countrySelect);
+    component.dropdownClick.subscribe(dropdownClick);
+    component.overlayShow.subscribe(overlayShow);
+    component.overlayHide.subscribe(overlayHide);
+    await fixture.whenStable();
+
+    const clickEvent = new MouseEvent('click');
+    component.toggleOverlay(clickEvent);
+    component.closeOverlay();
+    component.onCountrySelected(component.countries()[1]);
+    component.selectSuggestion({ name: 'Asha', phoneNumber: '+919876543210', countryCode: 'IN' });
+
+    expect(dropdownClick).toHaveBeenCalledWith(expect.objectContaining({ originalEvent: clickEvent, open: true }));
+    expect(overlayShow).toHaveBeenCalledWith({ type: 'countries' });
+    expect(overlayHide).toHaveBeenCalledWith({ type: 'countries' });
+    expect(countrySelect).toHaveBeenCalledWith(expect.objectContaining({ country: component.countries()[1] }));
+    expect(suggestionSelect).toHaveBeenCalledWith(expect.objectContaining({ suggestion: expect.objectContaining({ name: 'Asha' }) }));
   });
 
   it('should support template-driven forms', async () => {

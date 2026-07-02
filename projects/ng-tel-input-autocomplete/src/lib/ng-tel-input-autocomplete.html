@@ -1,8 +1,15 @@
 <div
   class="input-shell"
   [class.focused]="isFocused()"
-  [class.invalid]="hasError()"
-  [class.disabled]="disabled()"
+  [class.invalid]="isInvalid()"
+  [class.disabled]="isDisabled()"
+  [class.readonly]="isReadOnly()"
+  [class.fluid]="fluid()"
+  [class.filled]="variant() === 'filled'"
+  [class.small]="size() === 'small'"
+  [class.large]="size() === 'large'"
+  [ngClass]="containerClass()"
+  [ngStyle]="containerStyle()"
   cdkOverlayOrigin
   #containerOrigin="cdkOverlayOrigin"
   #containerEl
@@ -11,15 +18,17 @@
     #flagTrigger
     type="button"
     class="country-trigger"
+    [ngClass]="countryButtonClass()"
+    [ngStyle]="countryButtonStyle()"
     cdkOverlayOrigin
     #trigger="cdkOverlayOrigin"
     [id]="inputId() + '-country-trigger'"
-    [disabled]="disabled()"
+    [disabled]="isDisabled() || isReadOnly()"
     [attr.aria-label]="'Select country. Current country: ' + (selectedCountry()?.name || 'none')"
     aria-haspopup="listbox"
     [attr.aria-expanded]="isOpen()"
     [attr.aria-controls]="countryListboxId"
-    (click)="toggleOverlay()"
+    (click)="toggleOverlay($event)"
   >
     @if (selectedCountry(); as country) {
       @if (selectedCountryTemplate(); as template) {
@@ -49,35 +58,53 @@
   <input
     #phoneInput
     class="phone-input"
+    [ngClass]="inputClass()"
+    [ngStyle]="inputStyle()"
     type="tel"
+    [attr.name]="name()"
+    [attr.autocomplete]="autocomplete()"
+    [attr.inputmode]="inputMode()"
+    [attr.enterkeyhint]="enterKeyHint()"
+    [attr.pattern]="pattern()"
+    [attr.minlength]="minLength()"
+    [attr.maxlength]="maxLength()"
+    [attr.min]="min()"
+    [attr.max]="max()"
+    [attr.step]="step()"
+    [attr.size]="inputSize()"
+    [attr.required]="required() ? '' : null"
+    [attr.spellcheck]="spellcheck()"
+    [readOnly]="isReadOnly()"
     role="combobox"
     [attr.aria-autocomplete]="suggestionsEnabled() ? 'list' : 'none'"
-    autocomplete="tel"
     [id]="inputId()"
-    [attr.aria-label]="ariaLabel()"
+    [attr.aria-label]="ariaLabelledBy() ? null : ariaLabel()"
+    [attr.aria-labelledby]="ariaLabelledBy()"
     [attr.aria-expanded]="showSuggestions()"
     [attr.aria-controls]="suggestionsEnabled() ? suggestionsListboxId : null"
     [attr.aria-activedescendant]="activeSuggestionId"
-    [attr.aria-invalid]="hasError()"
-    [attr.aria-describedby]="hasError() ? inputId() + '-error' : null"
+    [attr.aria-invalid]="isInvalid()"
+    [attr.aria-readonly]="isReadOnly()"
+    [attr.aria-describedby]="inputDescribedBy"
     [value]="inputValue()"
-    [disabled]="disabled()"
-    [placeholder]="placeholder() || selectedCountry()?.placeholder || 'Enter phone number'"
+    [disabled]="isDisabled()"
+    [placeholder]="placeholder() ?? selectedCountry()?.placeholder ?? 'Enter phone number'"
     (input)="onInputChange($event)"
     (keydown)="handleInputKeyDown($event)"
-    (focus)="onFocus()"
-    (blur)="onBlur()"
+    (keyup)="handleInputKeyUp($event)"
+    (focus)="onFocus($event)"
+    (blur)="onBlur($event)"
   />
 
-  <div class="actions">
-    @if (inputValue() && !disabled()) {
+  <div class="actions" [ngClass]="actionsClass()" [ngStyle]="actionsStyle()">
+    @if (showClear() && inputValue() && !isDisabled() && !isReadOnly()) {
       <button type="button" class="clear-button" aria-label="Clear phone number" (click)="clearValue()">
         <lib-tel-icon name="close" aria-hidden="true" />
       </button>
     }
 
     @if (validationEnabled()) {
-      @if (hasError()) {
+      @if (isInvalid()) {
         <span class="status-icon invalid" title="Invalid phone number">
           <lib-tel-icon name="error" aria-hidden="true" />
         </span>
@@ -90,7 +117,7 @@
   </div>
 </div>
 
-@if (hasError()) {
+@if (isInvalid()) {
   <span class="sr-only" [id]="inputId() + '-error'" role="alert">Invalid phone number</span>
 }
 
@@ -135,6 +162,8 @@
     [countryTemplate]="countryTemplate()"
     [emptyTemplate]="emptyTemplate()"
     [loadingTemplate]="loadingTemplate()"
+    [panelClass]="dropdownClass()"
+    [panelStyle]="dropdownStyle()"
     (activeIndexChange)="activeCountryIndex.set($event)"
     (itemSelected)="onCountryDropdownItem($event)"
     (scrollEnd)="onScrollEndCountries()"
@@ -166,6 +195,8 @@
     [suggestionTemplate]="suggestionTemplate()"
     [emptyTemplate]="emptyTemplate()"
     [loadingTemplate]="loadingTemplate()"
+    [panelClass]="dropdownClass()"
+    [panelStyle]="dropdownStyle()"
     (activeIndexChange)="activeSuggestionIndex.set($event)"
     (itemSelected)="onSuggestionDropdownItem($event)"
     (scrollEnd)="onLoadMoreSuggestions()"

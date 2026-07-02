@@ -38,6 +38,45 @@
   background: #f9fafb;
 }
 
+.input-shell.fluid {
+  width: 100%;
+}
+
+.input-shell.filled {
+  border-color: transparent;
+  background: #f3f4f6;
+}
+
+.input-shell.filled.focused {
+  background: #fff;
+}
+
+.input-shell.small .country-trigger {
+  padding: .45rem .6rem;
+}
+
+.input-shell.small .phone-input {
+  padding: .5rem .7rem;
+  font-size: .875rem;
+}
+
+.input-shell.large .country-trigger {
+  padding: .8rem .9rem;
+}
+
+.input-shell.large .phone-input {
+  padding: .85rem 1rem;
+  font-size: 1rem;
+}
+
+.input-shell.readonly .country-trigger {
+  cursor: default;
+}
+
+.input-shell.readonly .phone-input {
+  cursor: text;
+}
+
 .country-trigger {
   display: inline-flex;
   flex: none;

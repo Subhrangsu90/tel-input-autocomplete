@@ -20,11 +20,37 @@ All component properties are signal-based Angular inputs.
 | `allowedCountries` | `readonly string[]` | `[]` | Restricts the picker to these ISO alpha-2 codes. |
 | `excludedCountries` | `readonly string[]` | `[]` | Removes these ISO alpha-2 codes from the picker. Applied after `allowedCountries`. |
 | `outputFormat` | `'string' \| 'object'` | `'string'` | Selects the form value and `valueChange` payload format. |
-| `placeholder` | `string` | `'Enter phone number...'` | Placeholder for the native telephone input. |
+| `name` | `string \| null` | `null` | Name forwarded to the native telephone input. Useful for browser autofill and non-Angular form serialization. |
+| `autocomplete` | `string` | `'tel'` | Native autocomplete hint forwarded to the telephone input. |
+| `inputMode` | `string` | `'tel'` | Native input mode hint for mobile keyboards. |
+| `enterKeyHint` | `string \| null` | `null` | Native enter key hint such as `done`, `next`, or `search`. |
+| `pattern` | `string \| null` | `null` | Native pattern attribute forwarded to the telephone input. |
+| `minLength` | `number \| null` | `null` | Native minimum text length attribute. |
+| `maxLength` | `number \| null` | `null` | Native maximum text length attribute. |
+| `min` | `number \| null` | `null` | Native minimum value attribute forwarded to the input. |
+| `max` | `number \| null` | `null` | Native maximum value attribute forwarded to the input. |
+| `step` | `number \| 'any' \| null` | `null` | Native step attribute forwarded to the input. |
+| `inputSize` | `number \| null` | `null` | Native size attribute controlling the visible input width in characters. |
+| `readOnly` | `boolean` | `false` | Makes the input readonly and prevents country, suggestion, and clear interactions. Programmatic form writes still work. |
+| `readonly` | `boolean` | `false` | Alias for `readOnly`, useful when matching native input or PrimeNG-style naming. |
+| `required` | `boolean` | `false` | Native required attribute forwarded to the telephone input. |
+| `spellcheck` | `boolean` | `false` | Native spellcheck attribute forwarded to the telephone input. |
+| `disabled` | `boolean` | `false` | Disables the input and country trigger outside Angular forms. CVA disabled state is also respected. |
+| `invalid` | `boolean` | `false` | Forces invalid visual and ARIA state from external validation. |
+| `ariaDescribedBy` | `string \| null` | `null` | Additional described-by IDs merged with the built-in error message ID. |
+| `ariaLabelledBy` | `string \| null` | `null` | External label IDs for `aria-labelledby`. When set, `ariaLabel` is not rendered. |
+| `placeholder` | `string \| null` | `null` | Custom placeholder for the native telephone input. When omitted, the selected country's example number is shown. |
 | `countrySearchUrl` | `string \| null` | `null` | Optional endpoint used for paginated country search in the browser. |
 | `suggestionsEnabled` | `boolean` | `true` | Enables the external contact-suggestion overlay and query events. |
 | `contactSearchEnabled` | `boolean` | `true` | Allows names to be entered as temporary contact-search queries. Alphabetic queries are not written to the form value. |
 | `validationEnabled` | `boolean` | `true` | Enables libphonenumber validation and the `invalidPhoneNumber` error. |
+| `minQueryLength` | `number \| null` | `null` | Minimum trimmed query length before contact suggestion search events are emitted. |
+| `delay` | `number \| null` | `null` | Country search debounce in milliseconds. Uses `250` when omitted. |
+| `completeOnFocus` | `boolean` | `true` | Emits suggestion search when the input receives focus. Disable to wait for typing. |
+| `showClear` | `boolean` | `true` | Shows the clear button when the input has a value. |
+| `fluid` | `boolean` | `false` | Adds a fluid styling hook for full-width layouts. The host already renders as a block. |
+| `variant` | `'filled' \| 'outlined'` | `'outlined'` | Selects outlined or filled input shell styling. |
+| `size` | `'small' \| 'large' \| null` | `null` | Adjusts input and trigger padding for compact or large displays. |
 | `suggestions` | `readonly PhoneSuggestion[]` | `[]` | Contact suggestions supplied by the consuming application. |
 | `suggestionsLoading` | `boolean` | `false` | Displays the suggestion loading state and prevents duplicate `loadMoreSuggestions` emissions. |
 | `suggestionsExhausted` | `boolean` | `false` | Indicates that no more contact suggestion pages are available. |
@@ -35,6 +61,16 @@ All component properties are signal-based Angular inputs.
 | `suggestionTemplate` | `TemplateRef<SuggestionTemplateContext> \| null` | `null` | Customizes every contact suggestion option. |
 | `emptyTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Customizes empty country and suggestion states. |
 | `loadingTemplate` | `TemplateRef<StateTemplateContext> \| null` | `null` | Customizes country and suggestion loading states. |
+| `containerClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the outer input shell. |
+| `containerStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the outer input shell. |
+| `countryButtonClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the country trigger button. |
+| `countryButtonStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the country trigger button. |
+| `inputClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the native telephone input. |
+| `inputStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the native telephone input. |
+| `actionsClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to the clear/status actions container. |
+| `actionsStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to the clear/status actions container. |
+| `dropdownClass` | `NgTelInputClassValue \| null` | `null` | Adds classes to country and suggestion dropdown panels. |
+| `dropdownStyle` | `NgTelInputStyleValue \| null` | `null` | Adds inline styles to country and suggestion dropdown panels. |
 
 ### Emitters
 
@@ -43,9 +79,21 @@ Angular output events do not bubble through the DOM.
 | Name | Payload | Emitted when |
 | --- | --- | --- |
 | `suggestionSearch` | `string` | The input receives focus or its contact-search query changes while suggestions are enabled. |
+| `completeMethod` | `AutoCompleteCompleteEvent` | PrimeNG-style typed search event. Emits with the current query when suggestions should be searched. |
 | `loadMoreSuggestions` | `void` | The suggestion list reaches its scroll boundary while it is not loading and `suggestionsExhausted` is false. |
 | `valueChange` | `PhoneInputValue` | User input, country selection, suggestion selection, or clearing changes the component value. `writeValue()` does not emit it. |
 | `countryLoadError` | `unknown` | Loading a configured country endpoint fails, including when `provideHttpClient()` is missing. |
+| `suggestionSelect` | `AutoCompleteSelectEvent` | A contact suggestion is selected by click or keyboard. |
+| `countrySelect` | `CountrySelectEvent` | A country is selected from the country list or detected-country prompt. |
+| `inputFocus` | `Event` | The native telephone input receives focus. |
+| `inputBlur` | `Event` | The native telephone input loses focus. |
+| `dropdownClick` | `AutoCompleteDropdownClickEvent` | The country dropdown trigger is clicked. |
+| `clear` | `void` | The clear button is clicked and the value is reset. |
+| `inputKeydown` | `KeyboardEvent` | A keydown event occurs on the native telephone input. |
+| `inputKeyup` | `KeyboardEvent` | A keyup event occurs on the native telephone input. |
+| `overlayShow` | `AutoCompleteOverlayEvent` | The country or suggestion overlay opens. |
+| `overlayHide` | `AutoCompleteOverlayEvent` | The country or suggestion overlay closes. |
+| `lazyLoad` | `AutoCompleteLazyLoadEvent` | Country pages or another suggestion page are requested from scroll. |
 
 ### Templates
 
@@ -91,6 +139,20 @@ Templates are passed as `TemplateRef` inputs. Custom option templates are render
 | `emptyTemplate` | `$implicit`, `type` (`'countries'` or `'suggestions'`) |
 | `loadingTemplate` | `$implicit`, `type` (`'countries'` or `'suggestions'`) |
 
+### Styling hooks
+
+Pass class or style inputs when an application needs to adjust the rendered parts without replacing templates.
+
+```html
+<ng-tel-input-autocomplete
+  containerClass="rounded-phone"
+  [containerStyle]="{ borderColor: '#2563eb' }"
+  inputClass="phone-text"
+  [dropdownStyle]="{ maxHeight: '18rem' }"
+/>
+```
+
+`NgTelInputClassValue` accepts the same shapes as `NgClass`: string, string array, `Set<string>`, or object map. `NgTelInputStyleValue` is an object map compatible with `NgStyle`.
 ### Forms and validation
 
 The component implements `ControlValueAccessor` and `Validator`, so it works with Reactive Forms and template-driven forms.
@@ -166,6 +228,44 @@ interface CountrySearchResponse {
     total: number;
     hasMore: boolean;
   };
+}
+```
+
+### Event payloads
+
+```ts
+interface AutoCompleteCompleteEvent {
+  originalEvent?: Event;
+  query: string;
+}
+
+interface AutoCompleteSelectEvent {
+  originalEvent?: Event;
+  suggestion: PhoneSuggestion;
+  value: PhoneInputValue;
+}
+
+interface CountrySelectEvent {
+  originalEvent?: Event;
+  country: Country;
+  value: PhoneInputValue;
+}
+
+interface AutoCompleteDropdownClickEvent {
+  originalEvent: MouseEvent;
+  open: boolean;
+}
+
+interface AutoCompleteOverlayEvent {
+  type: 'countries' | 'suggestions';
+}
+
+interface AutoCompleteLazyLoadEvent {
+  type: 'countries' | 'suggestions';
+  query: string;
+  page?: number;
+  rows?: number;
+  first?: number;
 }
 ```
 

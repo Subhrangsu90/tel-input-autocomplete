@@ -11,7 +11,7 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   Country,
@@ -21,6 +21,8 @@ import {
   StateTemplateContext,
   SuggestionTemplateContext,
   PhoneSuggestion,
+  NgTelInputClassValue,
+  NgTelInputStyleValue,
 } from './ng-tel-input-autocomplete.types';
 import { NgTelInputIcon } from './ng-tel-input-icons';
 
@@ -29,9 +31,14 @@ type DropdownItem = Country | PhoneSuggestion;
 @Component({
   selector: 'ng-tel-input-dropdown',
   standalone: true,
-  imports: [NgTemplateOutlet, NgTelInputIcon],
+  imports: [NgClass, NgStyle, NgTemplateOutlet, NgTelInputIcon],
   template: `
-    <div class="dropdown" (keydown)="handleKeyDown($event)">
+    <div
+      class="dropdown"
+      [ngClass]="panelClass()"
+      [ngStyle]="panelStyle()"
+      (keydown)="handleKeyDown($event)"
+    >
       @if (type() === 'countries') {
         <div class="search">
           <lib-tel-icon name="search" class="search-icon" aria-hidden="true" />
@@ -249,6 +256,8 @@ export class NgTelInputDropdown implements OnChanges, AfterViewInit {
   readonly suggestionTemplate = input<TemplateRef<SuggestionTemplateContext> | null>(null);
   readonly emptyTemplate = input<TemplateRef<StateTemplateContext> | null>(null);
   readonly loadingTemplate = input<TemplateRef<StateTemplateContext> | null>(null);
+  readonly panelClass = input<NgTelInputClassValue | null>(null);
+  readonly panelStyle = input<NgTelInputStyleValue | null>(null);
 
   readonly itemSelected = output<DropdownItem>();
   readonly searchChanged = output<string>();

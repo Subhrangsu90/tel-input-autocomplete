@@ -51,6 +51,46 @@ export interface StateTemplateContext {
   type: 'countries' | 'suggestions';
 }
 
+export interface AutoCompleteCompleteEvent {
+  originalEvent?: Event;
+  query: string;
+}
+
+export interface AutoCompleteSelectEvent {
+  originalEvent?: Event;
+  suggestion: PhoneSuggestion;
+  value: PhoneInputValue;
+}
+
+export interface CountrySelectEvent {
+  originalEvent?: Event;
+  country: Country;
+  value: PhoneInputValue;
+}
+
+export interface AutoCompleteDropdownClickEvent {
+  originalEvent: MouseEvent;
+  open: boolean;
+}
+
+export interface AutoCompleteOverlayEvent {
+  type: 'countries' | 'suggestions';
+}
+
+export interface AutoCompleteLazyLoadEvent {
+  type: 'countries' | 'suggestions';
+  query: string;
+  page?: number;
+  rows?: number;
+  first?: number;
+}
+
 export type PhoneInputValue = PhoneNumberValue | string | null;
 export type FlagMode = 'emoji' | 'image';
 export type FlagUrlResolver = (countryCode: string) => string;
+export type NgTelInputClassValue =
+  | string
+  | readonly string[]
+  | Set<string>
+  | Record<string, boolean | null | undefined>;
+export type NgTelInputStyleValue = Record<string, string | number | null | undefined>;
