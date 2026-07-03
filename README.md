@@ -2,12 +2,13 @@
 
 Professional Angular library workspace for `ng-tel-input-autocomplete`, an accessible international telephone input with country selection, phone-number formatting, validation, and optional contact autocomplete.
 
-This repository contains the published Angular library and a static demo application that can be deployed to Vercel.
+This repository contains the published Angular library, GitBook-ready documentation, and a static demo application that can be deployed to Vercel.
 
 ## Project Links
 
 - Repository: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
 - Library source: [projects/ng-tel-input-autocomplete](./projects/ng-tel-input-autocomplete)
+- GitBook docs source: [docs](./docs)
 - Library README: [projects/ng-tel-input-autocomplete/README.md](./projects/ng-tel-input-autocomplete/README.md)
 - API reference: [projects/ng-tel-input-autocomplete/API.md](./projects/ng-tel-input-autocomplete/API.md)
 - npm package: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
@@ -159,6 +160,20 @@ export const appConfig: ApplicationConfig = {
 ```
 
 For the complete consumer documentation, see the [library README](./projects/ng-tel-input-autocomplete/README.md). For every input, output, type, provider, and service method, see the [API reference](./projects/ng-tel-input-autocomplete/API.md).
+
+## GitBook Documentation
+
+The documentation source for GitBook lives in [`docs/`](./docs). GitBook is configured with [`.gitbook.yaml`](./.gitbook.yaml):
+
+```yaml
+root: ./docs/
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+```
+
+When connecting this repository in GitBook, keep the project directory at the repository root so GitBook can find `.gitbook.yaml`. The written docs are intended for GitBook; the Angular app remains the live demo for Vercel.
 
 ## Demo Application
 
