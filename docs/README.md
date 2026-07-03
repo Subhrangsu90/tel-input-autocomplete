@@ -54,8 +54,7 @@ export class PhoneFieldComponent {
 | [API Reference](api-reference.md) | Full component input/output table, events, templates, public types, and service methods. |
 | [Changelog](changelog.md) | Release history. |
 | [Help Center](help-center.md) | FAQs, SSR hydration issues, dropdown overflow clipping, and troubleshooting. |
-| [GitBook Setup](gitbook-setup.md) | How to connect this repository to GitBook. |
-| [Live Demo on Vercel](vercel-demo.md) | How to deploy the Angular demo app separately. |
+| [Live Demo](vercel-demo.md) | How to deploy the Angular demo app separately. |
 
 ## Repository
 
