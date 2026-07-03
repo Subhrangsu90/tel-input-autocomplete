@@ -3,12 +3,16 @@
 ## Start Here
 
 * [Overview](README.md)
-* [Getting Started](getting-started.md)
+* [Documentation](documentation.md)
 
 ## Reference
 
 * [API Reference](api-reference.md)
 * [Changelog](changelog.md)
+
+## Support
+
+* [Help Center](help-center.md)
 
 ## Deployment
 

@@ -50,9 +50,10 @@ export class PhoneFieldComponent {
 
 | Page | Use it for |
 | ---- | ---------- |
-| [Getting Started](getting-started.md) | Installation, app-wide defaults, forms, autocomplete, styling, accessibility, and publishing notes. |
+| [Documentation](documentation.md) | Installation, app-wide defaults, forms, autocomplete, styling, accessibility, and publishing notes. |
 | [API Reference](api-reference.md) | Full component input/output table, events, templates, public types, and service methods. |
 | [Changelog](changelog.md) | Release history. |
+| [Help Center](help-center.md) | FAQs, SSR hydration issues, dropdown overflow clipping, and troubleshooting. |
 | [GitBook Setup](gitbook-setup.md) | How to connect this repository to GitBook. |
 | [Live Demo on Vercel](vercel-demo.md) | How to deploy the Angular demo app separately. |
 

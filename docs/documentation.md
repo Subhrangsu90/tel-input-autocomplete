@@ -1,4 +1,4 @@
-# ng-tel-input-autocomplete
+# Documentation
 
 Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
 
@@ -18,7 +18,7 @@ Angular, Angular Forms, CDK, and RxJS are peer dependencies. The package install
 
 No Tailwind, global stylesheet, or external flag service is required. Styles are encapsulated in the components and emoji flags are the default.
 
-For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](./API.md).
+For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](./api-reference.md).
 
 ## Quick start
 
@@ -202,7 +202,7 @@ The `required` input only forwards the native `required` attribute. Use Angular 
 
 ## Inputs, outputs, and types
 
-Every component input, output event, interface, template context, and service method is documented in the [API reference](./API.md).
+Every component input, output event, interface, template context, and service method is documented in the [API reference](./api-reference.md).
 
 ## Styling
 
@@ -219,7 +219,7 @@ Use the class/style inputs to customize the built-in UI while keeping the compon
 
 ## Theme tokens
 
-The component exposes CSS custom properties on the host. Override them globally through `ng-tel-input-autocomplete { ... }`, or locally through wrapper selectors. See the [API reference](./API.md#theme-tokens) for the full token list.
+The component exposes CSS custom properties on the host. Override them globally through `ng-tel-input-autocomplete { ... }`, or locally through wrapper selectors. See the [API reference](./api-reference.md#theme-tokens) for the full token list.
 
 ```css
 ng-tel-input-autocomplete.enterprise-phone {

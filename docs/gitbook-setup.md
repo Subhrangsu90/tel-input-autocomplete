@@ -42,7 +42,7 @@ The GitBook docs currently mirror these package docs:
 
 | GitBook file | Source file |
 | ------------ | ----------- |
-| `docs/getting-started.md` | `projects/ng-tel-input-autocomplete/README.md` |
+| `docs/documentation.md` | `projects/ng-tel-input-autocomplete/README.md` |
 | `docs/api-reference.md` | `projects/ng-tel-input-autocomplete/API.md` |
 | `docs/changelog.md` | `projects/ng-tel-input-autocomplete/CHANGELOG.md` |
 
