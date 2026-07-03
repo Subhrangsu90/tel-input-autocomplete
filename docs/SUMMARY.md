@@ -1,13 +1,13 @@
-# Summary
+# Table of contents
 
 ## Core Docs
 
 * [Overview](README.md)
-* [Documentation](documentation.md)
-* [API Reference](api-reference.md)
-* [Changelog](changelog.md)
-* [Live Demo](vercel-demo.md)
+* [Documentation](core-docs/documentation.md)
+* [API Reference](core-docs/api-reference.md)
+* [Changelog](core-docs/changelog.md)
+* [Live Demo](core-docs/vercel-demo.md)
 
 ## Support
 
-* [Help Center](help-center.md)
+* [Help Center](support/help-center.md)

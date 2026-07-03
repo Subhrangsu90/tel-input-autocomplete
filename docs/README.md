@@ -1,4 +1,4 @@
-# ng-tel-input-autocomplete
+# Overview
 
 Accessible international telephone input and contact autocomplete for modern Angular applications.
 
@@ -6,15 +6,15 @@ Accessible international telephone input and contact autocomplete for modern Ang
 
 ## Why use it?
 
-- Standalone Angular component for Angular 21+
-- Works with Reactive Forms and template-driven forms
-- Supports typed `PhoneInputValue` output
-- Validates phone numbers with `google-libphonenumber`
-- Uses `intl-tel-input` country metadata
-- Includes accessible combobox and listbox behavior
-- Supports country filtering, remote country search, and lazy loading
-- Offers emoji or image flags
-- Exposes CSS variables and class/style hooks for product design systems
+* Standalone Angular component for Angular 21+
+* Works with Reactive Forms and template-driven forms
+* Supports typed `PhoneInputValue` output
+* Validates phone numbers with `google-libphonenumber`
+* Uses `intl-tel-input` country metadata
+* Includes accessible combobox and listbox behavior
+* Supports country filtering, remote country search, and lazy loading
+* Offers emoji or image flags
+* Exposes CSS variables and class/style hooks for product design systems
 
 ## Install
 
@@ -48,15 +48,15 @@ export class PhoneFieldComponent {
 
 ## Documentation sections
 
-| Page | Use it for |
-| ---- | ---------- |
-| [Documentation](documentation.md) | Installation, app-wide defaults, forms, autocomplete, styling, accessibility, and publishing notes. |
-| [API Reference](api-reference.md) | Full component input/output table, events, templates, public types, and service methods. |
-| [Changelog](changelog.md) | Release history. |
-| [Help Center](help-center.md) | FAQs, SSR hydration issues, dropdown overflow clipping, and troubleshooting. |
-| [Live Demo](vercel-demo.md) | How to deploy the Angular demo app separately. |
+| Page                                        | Use it for                                                                                          |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [Documentation](core-docs/documentation.md) | Installation, app-wide defaults, forms, autocomplete, styling, accessibility, and publishing notes. |
+| [API Reference](core-docs/api-reference.md) | Full component input/output table, events, templates, public types, and service methods.            |
+| [Changelog](core-docs/changelog.md)         | Release history.                                                                                    |
+| [Help Center](support/help-center.md)       | FAQs, SSR hydration issues, dropdown overflow clipping, and troubleshooting.                        |
+| [Live Demo](core-docs/vercel-demo.md)       | How to deploy the Angular demo app separately.                                                      |
 
 ## Repository
 
-- GitHub: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
-- npm: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
+* GitHub: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
+* npm: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
