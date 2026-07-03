@@ -47,3 +47,17 @@ The GitBook docs currently mirror these package docs:
 | `docs/changelog.md` | `projects/ng-tel-input-autocomplete/CHANGELOG.md` |
 
 After changing the package README, API reference, or changelog, copy the updated content into `docs/` before syncing GitBook.
+
+## Configuring GitBook UI Navigation (Removing Custom Header Tabs)
+
+Since we are using a **Single Space with a Unified Sidebar**, you should disable or remove any custom navigation header tabs/links (like `Documentation`, `API Reference`, `Changelog`, or `Help Center`) configured in the GitBook dashboard. This prevents the sidebar from containing duplicate pages or appearing confusingly.
+
+To do this:
+1. Log in to your GitBook organization dashboard.
+2. Open your target Docs Space or Docs Site.
+3. In the sidebar, click on **Settings** > **Layout** (or **Structure**).
+4. Look for the **Header** or **Top Navigation** section.
+5. Delete any custom page links or tabs that you added manually.
+6. Save the settings. 
+
+All pages will now be cleanly accessible directly from the sidebar.
