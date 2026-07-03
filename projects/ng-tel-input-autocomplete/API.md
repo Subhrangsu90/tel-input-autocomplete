@@ -1,5 +1,18 @@
 # API reference
 
+## Public exports
+
+The package root exports:
+
+| Export | Kind | Notes |
+| ------ | ---- | ----- |
+| `NgTelInputAutocomplete` | Standalone component | Import directly in standalone components or NgModule declarations. |
+| `NgTelInputAutocompleteService` | Injectable service | Shared country, parsing, formatting, validation, and highlighting helpers. |
+| `provideNgTelInputAutocomplete` | Provider factory | Sets app-wide defaults. |
+| `NG_TEL_INPUT_AUTOCOMPLETE_CONFIG` | Injection token | Advanced configuration access for tests and integrations. |
+| `NG_TEL_INPUT_AUTOCOMPLETE_DEFAULT_CONFIG` | Constant | Default configuration object. |
+| Types and interfaces | TypeScript exports | `Country`, `PhoneNumberValue`, `PhoneSuggestion`, event payloads, template contexts, config types, and helper aliases. |
+
 ## Provider API
 
 Use `provideNgTelInputAutocomplete()` to define application-wide defaults. Inputs on an individual component instance take precedence.
@@ -68,6 +81,7 @@ All component properties are signal-based Angular inputs.
 | `name`                    | `string \| null`                                 | `null`                         | Name forwarded to the native telephone input. Useful for browser autofill and non-Angular form serialization.                                     |
 | `autocomplete`            | `string`                                         | `'tel'`                        | Native autocomplete hint forwarded to the telephone input.                                                                                        |
 | `inputMode`               | `string`                                         | `'tel'`                        | Native input mode hint for mobile keyboards.                                                                                                      |
+| `dir`                     | `'ltr' \| 'rtl' \| 'auto' \| null`               | `null`                         | Host direction and dropdown direction. Use for RTL or mixed-language layouts.                                                                     |
 | `enterKeyHint`            | `string \| null`                                 | `null`                         | Native enter key hint such as `done`, `next`, or `search`.                                                                                        |
 | `pattern`                 | `string \| null`                                 | `null`                         | Native pattern attribute forwarded to the telephone input.                                                                                        |
 | `minLength`               | `number \| null`                                 | `null`                         | Native minimum text length attribute.                                                                                                             |
@@ -244,6 +258,24 @@ A non-empty invalid phone value produces:
 }
 ```
 
+## Country data and remote search
+
+By default, countries are loaded from the bundled metadata and enriched with `intl-tel-input` and `google-libphonenumber` examples. `allowedCountries` and `excludedCountries` always use the local list.
+
+When `countrySearchUrl` is set and no country filters are active, browser-side country searches call the configured endpoint with `q`, `page`, and `limit` query parameters. The endpoint must return `CountrySearchResponse`.
+
+Applications must provide Angular HTTP when using a remote country endpoint:
+
+```ts
+import { provideHttpClient, withFetch } from '@angular/common/http';
+
+bootstrapApplication(App, {
+  providers: [provideHttpClient(withFetch())],
+});
+```
+
+During server rendering, the component falls back to the local country list.
+
 ### Signal Forms
 
 Angular 21 Signal Forms can bind to the component through the same control contract. Keep the field value type aligned with `outputFormat`.
@@ -391,6 +423,9 @@ interface NgTelInputAutocompleteConfig {
   /* see Provider API */
 }
 type NgTelInputAutocompleteConfigInput = Partial<NgTelInputAutocompleteConfig>;
+type NgTelInputClassValue =
+  string | readonly string[] | Set<string> | Record<string, boolean | null | undefined>;
+type NgTelInputStyleValue = Record<string, string | number | null | undefined>;
 ```
 
 ## NgTelInputAutocompleteService

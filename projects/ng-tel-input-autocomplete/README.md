@@ -1,12 +1,12 @@
 # ng-tel-input-autocomplete
 
-Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, and optional paginated country APIs.
+Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
 
 ## Compatibility
 
 | Library | Angular | Node.js                |
 | ------- | ------- | ---------------------- |
-| 0.0.x   | 21.2.x  | 20.19+, 22.12+, or 24+ |
+| 0.1.x   | 21.x    | 20.19+, 22.12+, or 24+ |
 
 ## Installation
 
@@ -19,6 +19,34 @@ Angular, Angular Forms, CDK, and RxJS are peer dependencies. The package install
 No Tailwind, global stylesheet, or external flag service is required. Styles are encapsulated in the components and emoji flags are the default.
 
 For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](./API.md).
+
+## Quick start
+
+Import the standalone component where it is used:
+
+```ts
+import { Component } from '@angular/core';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomplete';
+
+@Component({
+  selector: 'app-phone-field',
+  imports: [ReactiveFormsModule, NgTelInputAutocomplete],
+  template: `
+    <label for="customer-phone">Phone</label>
+    <ng-tel-input-autocomplete
+      inputId="customer-phone"
+      [formControl]="phone"
+      defaultCountry="US"
+    />
+  `,
+})
+export class PhoneField {
+  readonly phone = new FormControl<PhoneInputValue>(null);
+}
+```
+
+For template-driven forms, import `FormsModule` and bind with `[(ngModel)]`.
 
 ## Application-wide defaults
 
@@ -107,6 +135,20 @@ readonly contactForm = form(this.model, schema((field) => {
 ```
 
 Import `FormsModule` in the consuming component.
+
+## Country filtering and layout direction
+
+Use ISO 3166-1 alpha-2 country codes for country filtering:
+
+```html
+<ng-tel-input-autocomplete
+  defaultCountry="IN"
+  [allowedCountries]="['IN', 'US', 'GB']"
+  [excludedCountries]="['GB']"
+/>
+```
+
+Set `dir="rtl"` or `dir="auto"` when the field appears in right-to-left or mixed-language layouts.
 
 ## Contact autocomplete
 
@@ -252,7 +294,13 @@ npm run build:lib
 npm run verify:lib
 ```
 
-`verify:lib` tests the library, builds the production package and demo against `dist`, and performs an npm package dry run. Publishing should be performed from `dist/ng-tel-input-autocomplete` through the release workflow.
+The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the built npm artifact. `verify:lib` tests the library, builds the production package and demo against `dist`, and performs an npm package dry run. Publishing should be performed from `dist/ng-tel-input-autocomplete` through the release workflow.
+
+## Links
+
+- Repository: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
+- Library source: [projects/ng-tel-input-autocomplete](https://github.com/Subhrangsu90/my-workspace/tree/master/projects/ng-tel-input-autocomplete)
+- npm package: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
 
 ## License
 

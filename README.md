@@ -1,59 +1,192 @@
-# MyWorkspace
+# ng-tel-input-autocomplete Workspace
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+Professional Angular library workspace for `ng-tel-input-autocomplete`, an accessible international telephone input with country selection, phone-number formatting, validation, and optional contact autocomplete.
 
-## Development server
+This repository contains the published Angular library and a static demo application that can be deployed to Vercel.
 
-To start a local development server, run:
+## Project Links
 
-```bash
-ng serve
+- Repository: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
+- Library source: [projects/ng-tel-input-autocomplete](./projects/ng-tel-input-autocomplete)
+- Library README: [projects/ng-tel-input-autocomplete/README.md](./projects/ng-tel-input-autocomplete/README.md)
+- API reference: [projects/ng-tel-input-autocomplete/API.md](./projects/ng-tel-input-autocomplete/API.md)
+- npm package: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
+
+## What This Library Provides
+
+`ng-tel-input-autocomplete` is built for production Angular forms that need international phone entry without giving up accessibility or customization.
+
+Key capabilities:
+
+- Standalone Angular component for Angular 21+
+- Reactive Forms, template-driven forms, and Signal Forms compatible control contract
+- Country picker with search, keyboard support, and optional remote pagination
+- Formatting and validation powered by `google-libphonenumber`
+- Country metadata powered by `intl-tel-input`
+- Optional contact autocomplete controlled by the consuming application
+- String or object output formats
+- Emoji or image flag modes
+- Design-system-friendly CSS custom properties
+- Accessible combobox/listbox semantics
+- Static Angular demo ready for Vercel deployment
+
+## Repository Structure
+
+```text
+.
+|-- projects/
+|   |-- demo/                         # Angular demo app deployed to Vercel
+|   `-- ng-tel-input-autocomplete/    # Library source, README, API docs, package metadata
+|-- dist/                             # Generated build output
+|-- angular.json                      # Angular workspace configuration
+|-- package.json                      # Workspace scripts and dependencies
+|-- vercel.json                       # Vercel static deployment configuration
+`-- README.md                         # Workspace and deployment documentation
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Requirements
 
-## Code scaffolding
+| Tool    | Version                                  |
+| ------- | ---------------------------------------- |
+| Node.js | `20.19+`, `22.12+`, or `24+`             |
+| npm     | `11.6.4` as declared by `packageManager` |
+| Angular | `21.x`                                   |
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Install dependencies from the repository root:
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
+## Local Development
 
-To build the project run:
+Start the demo application:
 
 ```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Then open:
 
-## Running unit tests
+```text
+http://localhost:4200/
+```
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Build only the library:
 
 ```bash
-ng test
+npm run build:lib
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Build only the demo app:
 
 ```bash
-ng e2e
+npm run build:demo
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Build everything:
 
-## Additional Resources
+```bash
+npm run build
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Run tests:
+
+```bash
+npm test
+```
+
+Run the full library verification flow:
+
+```bash
+npm run verify:lib
+```
+
+`verify:lib` runs the library tests, builds the library, builds the demo, and performs an npm package dry run from `dist/ng-tel-input-autocomplete`.
+
+## Using The Library In An Angular App
+
+Install the package:
+
+```bash
+npm install ng-tel-input-autocomplete @angular/cdk
+```
+
+Use the standalone component with Reactive Forms:
+
+```ts
+import { Component } from '@angular/core';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomplete';
+
+@Component({
+  selector: 'app-contact-phone',
+  imports: [ReactiveFormsModule, NgTelInputAutocomplete],
+  template: `
+    <label for="contact-phone">Phone</label>
+    <ng-tel-input-autocomplete
+      inputId="contact-phone"
+      [formControl]="phone"
+      defaultCountry="IN"
+      [suggestionsEnabled]="false"
+    />
+  `,
+})
+export class ContactPhoneComponent {
+  readonly phone = new FormControl<PhoneInputValue>(null, {
+    validators: [Validators.required],
+  });
+}
+```
+
+Set app-wide defaults during bootstrap:
+
+```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideNgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideNgTelInputAutocomplete({
+      defaultCountry: 'IN',
+      outputFormat: 'string',
+      validationEnabled: true,
+      suggestionsEnabled: true,
+      flagMode: 'emoji',
+    }),
+  ],
+};
+```
+
+For the complete consumer documentation, see the [library README](./projects/ng-tel-input-autocomplete/README.md). For every input, output, type, provider, and service method, see the [API reference](./projects/ng-tel-input-autocomplete/API.md).
+
+## Demo Application
+
+The demo app lives in `projects/demo` and showcases:
+
+- Interactive Reactive Forms playground
+- Contact autocomplete examples
+- Template-driven form integration
+- Object and string output formats
+- Disabled, readonly, validation, and clear states
+- Styling, sizes, variants, flag modes, and CSS theme tokens
+- Advanced country filtering and event logging
+
+Production build output is generated at:
+
+```text
+dist/demo/browser
+```
+
+## Documentation Map
+
+| Document                                                          | Purpose                                                              |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [README.md](./README.md)                                          | Workspace, demo, deployment, and quick usage                         |
+| [Library README](./projects/ng-tel-input-autocomplete/README.md)  | Consumer guide for the npm package                                   |
+| [API.md](./projects/ng-tel-input-autocomplete/API.md)             | Complete component, provider, type, event, template, and service API |
+| [CHANGELOG.md](./projects/ng-tel-input-autocomplete/CHANGELOG.md) | Release history                                                      |
+
+## License
+
+MIT. See [projects/ng-tel-input-autocomplete/LICENSE](./projects/ng-tel-input-autocomplete/LICENSE).
