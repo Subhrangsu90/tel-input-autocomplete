@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0 - 2026-07-04
+
+- **Preferred Countries list (`preferredCountries`)**: Added support to prioritize specific countries at the top of the dropdown, separated by a separator line, for quicker navigation.
+- **Detailed Validation Errors**: Enhanced ControlValueAccessor validator to return detailed reason codes (`TOO_SHORT`, `TOO_LONG`, `INVALID_COUNTRY_CODE`, `INVALID_LENGTH`) along with a boolean `invalid: true` status flag.
+- **Auto-Formatting Toggle (`formatOnInput`)**: Introduced `[formatOnInput]` option to disable formatting during typing to allow raw input.
+- **DX & UX Polishes**: Enabled copying code snippets directly from the code viewer even when collapsed, added playground controls for testing new features, and improved responsiveness.
+
 ## 0.1.2 - 2026-07-04
 
 - Fixed duplicate country dial code prefixing when parsing or validating raw subscriber numbers that start with a dial code.

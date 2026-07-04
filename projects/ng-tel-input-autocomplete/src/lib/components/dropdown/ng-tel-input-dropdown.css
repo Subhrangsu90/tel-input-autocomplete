@@ -304,3 +304,9 @@
     }
 }
 
+.ngti-divider {
+    height: 1px;
+    margin: var(--ngti-space-divider-margin, 0.25rem 0);
+    background-color: var(--ngti-color-border-soft, #e2e8f0);
+}
+

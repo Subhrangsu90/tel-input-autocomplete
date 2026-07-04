@@ -8,6 +8,8 @@ export const NG_TEL_INPUT_AUTOCOMPLETE_DEFAULT_CONFIG: NgTelInputAutocompleteCon
   defaultCountry: 'US',
   allowedCountries: [],
   excludedCountries: [],
+  preferredCountries: [],
+  formatOnInput: true,
   outputFormat: 'string',
   autocomplete: 'tel',
   inputMode: 'tel',

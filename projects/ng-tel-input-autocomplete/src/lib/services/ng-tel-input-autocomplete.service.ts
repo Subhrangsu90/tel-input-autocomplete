@@ -266,6 +266,57 @@ export class NgTelInputAutocompleteService {
   }
 
   /**
+   * Retrieves the exact validation error reason for a phone number and country.
+   */
+  getValidationErrorReason(phoneNumber: string, countryCode: string): string | null {
+    try {
+      if (!phoneNumber || !countryCode) return 'INVALID_LENGTH';
+      let checkInput = phoneNumber;
+      if (!phoneNumber.startsWith('+')) {
+        const staticC = this.getStaticCountries().find(
+          (c) => c.code.toUpperCase() === countryCode.toUpperCase(),
+        );
+        if (staticC) {
+          const dialWithoutPlus = staticC.dialCode.replace('+', '');
+          const cleaned = phoneNumber.replace(/\D/g, '');
+          if (cleaned.startsWith(dialWithoutPlus)) {
+            checkInput = `+${cleaned}`;
+          } else {
+            checkInput = `${staticC.dialCode}${cleaned}`;
+          }
+        }
+      }
+      const parsedNumber = this.phoneUtil.parseAndKeepRawInput(
+        checkInput,
+        countryCode.toUpperCase(),
+      );
+      
+      const reasonCode = this.phoneUtil.isPossibleNumberWithReason(parsedNumber);
+      const ValidationResult = lpn.PhoneNumberUtil.ValidationResult;
+      
+      switch (reasonCode) {
+        case ValidationResult.IS_POSSIBLE:
+          if (this.phoneUtil.isValidNumber(parsedNumber)) {
+            return null;
+          }
+          return 'INVALID_LENGTH';
+        case ValidationResult.INVALID_COUNTRY_CODE:
+          return 'INVALID_COUNTRY_CODE';
+        case ValidationResult.TOO_SHORT:
+          return 'TOO_SHORT';
+        case ValidationResult.TOO_LONG:
+          return 'TOO_LONG';
+        case ValidationResult.IS_POSSIBLE_LOCAL_ONLY:
+          return 'INVALID_LENGTH';
+        default:
+          return 'INVALID_LENGTH';
+      }
+    } catch {
+      return 'INVALID_LENGTH';
+    }
+  }
+
+  /**
    * Formats a phone number in E164 format.
    */
   formatE164(phoneNumber: string, countryCode: string): string {

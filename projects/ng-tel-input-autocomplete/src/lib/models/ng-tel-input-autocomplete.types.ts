@@ -5,6 +5,7 @@ export interface Country {
   flag: string; // Emoji flag
   format: string; // Formatting string, e.g. "(###) ###-####" where # is a digit
   placeholder: string; // Example formatted phone number
+  isPreferred?: boolean;
 }
 
 export interface PhoneNumberValue {
@@ -94,6 +95,8 @@ export interface NgTelInputAutocompleteConfig {
   defaultCountry: string;
   allowedCountries: readonly string[];
   excludedCountries: readonly string[];
+  preferredCountries: readonly string[];
+  formatOnInput: boolean;
   outputFormat: 'string' | 'object';
   autocomplete: string;
   inputMode: string;

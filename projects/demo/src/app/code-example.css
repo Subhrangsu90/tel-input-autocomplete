@@ -94,3 +94,41 @@
   white-space: pre;
   display: block;
 }
+
+/* Button styling copy from app.css to work inside encapsulated component */
+.demo-btn {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.demo-btn--primary {
+  background: var(--demo-primary);
+  color: white;
+}
+
+.demo-btn--primary:hover {
+  background: var(--demo-primary-hover);
+}
+
+.demo-btn--outline {
+  background: transparent;
+  border: 1px solid var(--demo-primary-muted);
+  color: var(--demo-text-secondary);
+}
+
+.demo-btn--outline:hover {
+  background: var(--demo-primary-soft);
+}
+
+.demo-btn--xs {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+}

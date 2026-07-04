@@ -14,7 +14,7 @@ import { StackblitzService } from './stackblitz.service';
         <button type="button" class="demo-btn demo-btn--outline demo-btn--xs" (click)="toggleCode()">
           {{ showCode() ? 'Hide Code' : 'Show Code' }}
         </button>
-        <button type="button" class="demo-btn demo-btn--outline demo-btn--xs" (click)="copyCode()" [disabled]="!showCode()">
+        <button type="button" class="demo-btn demo-btn--outline demo-btn--xs" (click)="copyCode()">
           {{ copyStatus() }}
         </button>
         <button type="button" class="demo-btn demo-btn--primary demo-btn--xs code-btn--stackblitz" (click)="openInStackblitz()">

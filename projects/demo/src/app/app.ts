@@ -144,6 +144,8 @@ export class App implements OnInit {
     [suggestionsExhausted]="suggestionsExhausted()"
     (suggestionSearch)="onQueryChange($event)"
     (loadMoreSuggestions)="onLoadMore()"
+    [preferredCountries]="['US', 'IN']"
+    [formatOnInput]="formatOnInput()"
     size="small"
   />
 </form>`;
@@ -168,6 +170,11 @@ export class App implements OnInit {
   protected readonly suggestions = signal<PhoneSuggestion[]>([]);
   protected readonly loading = signal(false);
   protected readonly suggestionsExhausted = signal(false);
+  protected readonly formatOnInput = signal(true);
+
+  protected onLoadMore() {
+    // Load more suggestions if paginated...
+  }
   
   private readonly querySubject = new Subject<string>();
 
@@ -299,6 +306,8 @@ export class App {
   protected readonly defaultCountry = signal('IN');
   protected readonly contactSearchEnabled = signal(false);
   protected readonly validationEnabled = signal(true);
+  protected readonly formatOnInput = signal(true);
+  protected readonly preferredCountries = signal<string[]>(['US', 'IN']);
   protected readonly templatePhone = signal('+919876543210');
   protected readonly objectValue = signal<PhoneInputValue>(null);
   protected readonly darkPhone = signal<PhoneInputValue>(null);
@@ -366,6 +375,11 @@ export class App {
   protected onValidationChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
     this.validationEnabled.set(checked);
+  }
+
+  protected onFormatChange(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.formatOnInput.set(checked);
   }
 
   protected onLoadMore() {

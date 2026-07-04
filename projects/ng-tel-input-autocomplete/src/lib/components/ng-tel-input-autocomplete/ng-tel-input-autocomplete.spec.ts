@@ -408,7 +408,12 @@ describe('NgTelInputAutocomplete', () => {
     const control = new FormControl<PhoneInputValue>('123');
 
     component.writeValue('123');
-    expect(component.validate(control)).toEqual({ invalidPhoneNumber: true });
+    expect(component.validate(control)).toEqual({
+      invalidPhoneNumber: {
+        invalid: true,
+        reason: 'TOO_SHORT',
+      },
+    });
 
     fixture.componentRef.setInput('validationEnabled', false);
     await fixture.whenStable();
@@ -534,5 +539,31 @@ describe('NgTelInputAutocomplete', () => {
     // Test validation with dial code but no '+'
     expect(service.isValidNumber('966501234567', 'SA')).toBe(true);
     expect(service.isValidNumber('+966501234567', 'SA')).toBe(true);
+  });
+
+  it('should support preferredCountries and order them at the top of static countries list', async () => {
+    fixture.componentRef.setInput('preferredCountries', ['EG', 'SA']);
+    await fixture.whenStable();
+
+    const filtered = component['getFilteredStaticCountries']('');
+    expect(filtered[0].code).toBe('EG');
+    expect(filtered[0].isPreferred).toBe(true);
+    expect(filtered[1].code).toBe('SA');
+    expect(filtered[1].isPreferred).toBe(true);
+    expect(filtered[2].isPreferred).toBeFalsy();
+  });
+
+  it('should support formatOnInput toggle and avoid formatting if set to false', async () => {
+    fixture.componentRef.setInput('defaultCountry', 'US');
+    fixture.componentRef.setInput('formatOnInput', false);
+    await fixture.whenStable();
+
+    component.writeValue('2025550123');
+    expect(component.inputValue()).toBe('2025550123');
+
+    const inputElement = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    inputElement.value = '2025550124';
+    component.onInputChange({ target: inputElement } as any);
+    expect(component.inputValue()).toBe('2025550124');
   });
 });

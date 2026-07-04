@@ -53,6 +53,8 @@
                   [suggestionsExhausted]="suggestionsExhausted()"
                   (suggestionSearch)="onQueryChange($event)"
                   (loadMoreSuggestions)="onLoadMore()"
+                  [preferredCountries]="['US', 'IN']"
+                  [formatOnInput]="formatOnInput()"
                   size="small"
                   [invalid]="
                     testForm.controls.phoneAutocomplete.invalid &&
@@ -69,6 +71,9 @@
                       Phone number is required.
                     } @else if (testForm.controls.phoneAutocomplete.errors['invalidPhoneNumber']) {
                       Please enter a valid international telephone number.
+                      @if (testForm.controls.phoneAutocomplete.errors['invalidPhoneNumber'].reason; as reason) {
+                        <span class="demo-error-reason" style="font-size: 0.75rem; opacity: 0.85; display: block; margin-top: 0.2rem;">(Reason: {{ reason }})</span>
+                      }
                     }
                   </div>
                 }
@@ -98,6 +103,14 @@
                       Validation
                     </label>
                     <label class="demo-toggle">
+                      <input
+                        type="checkbox"
+                        [checked]="formatOnInput()"
+                        (change)="onFormatChange($event)"
+                      />
+                      Auto-formatting
+                    </label>
+                    <label class="demo-toggle">
                       Default country
                       <select [value]="defaultCountry()" (change)="onDefaultCountryChange($event)">
                         <option value="US">🇺🇸 US</option>
@@ -116,6 +129,8 @@
                   [contactSearchEnabled]="contactSearchEnabled()"
                   [validationEnabled]="validationEnabled()"
                   [defaultCountry]="defaultCountry()"
+                  [preferredCountries]="['US', 'IN']"
+                  [formatOnInput]="formatOnInput()"
                   [placeholder]="
                     contactSearchEnabled()
                       ? 'Type a contact name or phone number...'
@@ -128,6 +143,9 @@
                       Phone number is required.
                     } @else if (testForm.controls.phoneNormal.errors['invalidPhoneNumber']) {
                       Please enter a valid international telephone number.
+                      @if (testForm.controls.phoneNormal.errors['invalidPhoneNumber'].reason; as reason) {
+                        <span class="demo-error-reason" style="font-size: 0.75rem; opacity: 0.85; display: block; margin-top: 0.2rem;">(Reason: {{ reason }})</span>
+                      }
                     }
                   </div>
                 }
@@ -401,6 +419,7 @@
             >
               <div class="example-stack">
                 <ng-tel-input-autocomplete
+                  class="custom-theme-phone"
                   defaultCountry="DE"
                   [suggestionsEnabled]="false"
                   variant="filled"

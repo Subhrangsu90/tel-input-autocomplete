@@ -83,6 +83,9 @@
             }
           }
         </button>
+        @if (country.isPreferred && !countriesCast[index + 1]?.isPreferred) {
+          <div class="ngti-divider" role="separator"></div>
+        }
       } @empty {
         <div class="ngti-empty" role="status">
           @if (emptyTemplate(); as template) {
