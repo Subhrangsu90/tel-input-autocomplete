@@ -12,7 +12,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   Country,
   CountryTemplateContext,
@@ -68,7 +67,6 @@ export class NgTelInputDropdown implements OnChanges, AfterViewInit {
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   readonly listContainer = viewChild<ElementRef<HTMLDivElement>>('listContainer');
 
-  private readonly sanitizer = inject(DomSanitizer);
 
   get listboxId(): string {
     return `${this.idPrefix()}-${this.type()}-listbox`;
@@ -151,15 +149,15 @@ export class NgTelInputDropdown implements OnChanges, AfterViewInit {
     }
   }
 
-  getHighlightedText(text: string, search: string): SafeHtml {
+  getHighlightedText(text: string, search: string): string {
     const escapedText = escapeHtml(text || '');
     if (!search) return escapedText;
     const escapedSearch = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
     const highlighted = escapedText.replace(
       new RegExp(`(${escapedSearch})`, 'gi'),
-      '<mark style="background:var(--ngti-color-highlight-bg,#dbeafe);color:var(--ngti-color-highlight-text,#172554);font-weight:700;border-radius:.2rem;padding:0 .05rem">$1</mark>',
+      '<mark class="ngti-highlight">$1</mark>',
     );
-    return this.sanitizer.bypassSecurityTrustHtml(highlighted);
+    return highlighted;
   }
 
   handleKeyDown(event: KeyboardEvent): void {
@@ -215,3 +213,4 @@ export class NgTelInputDropdown implements OnChanges, AfterViewInit {
     });
   }
 }
+

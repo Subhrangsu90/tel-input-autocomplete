@@ -27,6 +27,8 @@ bootstrapApplication(App, {
       flagMode: 'emoji',
       validationEnabled: true,
       resetCountryOnClear: false,
+      preferredCountries: ['IN', 'US'],
+      autoSelectCountryOnDialCode: true,
     }),
   ],
 });
@@ -37,12 +39,17 @@ interface NgTelInputAutocompleteConfig {
   defaultCountry: string;
   allowedCountries: readonly string[];
   excludedCountries: readonly string[];
+  preferredCountries: readonly string[];
+  formatOnInput: boolean;
+  autoSelectCountryOnDialCode: boolean;
+  countrySearchFields: readonly CountrySearchField[];
   outputFormat: 'string' | 'object';
   autocomplete: string;
   inputMode: string;
   suggestionsEnabled: boolean;
   contactSearchEnabled: boolean;
   validationEnabled: boolean;
+  validationMessage: string;
   minQueryLength: number | null;
   delay: number | null;
   completeOnFocus: boolean;
@@ -77,6 +84,10 @@ All component properties are signal-based Angular inputs.
 | `defaultCountry`          | `string`                                         | `'US'`                         | Default ISO 3166-1 alpha-2 country code.                                                                                                          |
 | `allowedCountries`        | `readonly string[]`                              | `[]`                           | Restricts the picker to these ISO alpha-2 codes.                                                                                                  |
 | `excludedCountries`       | `readonly string[]`                              | `[]`                           | Removes these ISO alpha-2 codes from the picker. Applied after `allowedCountries`.                                                                |
+| `preferredCountries`      | `readonly string[]`                              | `[]`                           | Moves these ISO alpha-2 codes to the top of the unfiltered country list and marks them as preferred.                                             |
+| `formatOnInput`           | `boolean`                                        | `true`                         | Formats digits while typing and when values are written. Disable to preserve raw digits in the displayed input.                                  |
+| `autoSelectCountryOnDialCode` | `boolean`                                    | `true`                         | Automatically switches country when an international dial code is typed or pasted. Disable to show the detected-country prompt instead.          |
+| `countrySearchFields`     | `readonly CountrySearchField[]`                  | `['name', 'code', 'dialCode']` | Controls which local country fields are searched.                                                                                                |
 | `outputFormat`            | `'string' \| 'object'`                           | `'string'`                     | Selects the form value and `valueChange` payload format.                                                                                          |
 | `name`                    | `string \| null`                                 | `null`                         | Name forwarded to the native telephone input. Useful for browser autofill and non-Angular form serialization.                                     |
 | `autocomplete`            | `string`                                         | `'tel'`                        | Native autocomplete hint forwarded to the telephone input.                                                                                        |
@@ -103,6 +114,7 @@ All component properties are signal-based Angular inputs.
 | `suggestionsEnabled`      | `boolean`                                        | `true`                         | Enables the external contact-suggestion overlay and query events.                                                                                 |
 | `contactSearchEnabled`    | `boolean`                                        | `true`                         | Allows names to be entered as temporary contact-search queries. Alphabetic queries are not written to the form value.                             |
 | `validationEnabled`       | `boolean`                                        | `true`                         | Enables libphonenumber validation and the `invalidPhoneNumber` error.                                                                             |
+| `validationMessage`       | `string`                                         | `'Invalid phone number'`       | Screen-reader-only validation message rendered when the component is invalid.                                                                    |
 | `minQueryLength`          | `number \| null`                                 | `null`                         | Minimum trimmed query length before contact suggestion search events are emitted.                                                                 |
 | `delay`                   | `number \| null`                                 | `null`                         | Country search debounce in milliseconds. Uses `250` when omitted.                                                                                 |
 | `completeOnFocus`         | `boolean`                                        | `true`                         | Emits suggestion search when the input receives focus. Disable to wait for typing.                                                                |
@@ -250,28 +262,15 @@ The `required` input only forwards the native `required` attribute to the render
 | `outputFormat="object"`                 | `PhoneNumberValue`                  |
 | Empty value or alphabetic contact query | `null`                              |
 
-A non-empty invalid phone value produces:
+A non-empty invalid phone value produces a structured validation error with a reason from libphonenumber when available:
 
 ```ts
 {
-  invalidPhoneNumber: true;
+  invalidPhoneNumber: {
+    invalid: true,
+    reason: 'TOO_SHORT' | 'TOO_LONG' | 'INVALID_COUNTRY_CODE' | 'INVALID_LENGTH',
+  },
 }
-```
-
-## Country data and remote search
-
-By default, countries are loaded from the bundled metadata and enriched with `intl-tel-input` and `google-libphonenumber` examples. `allowedCountries` and `excludedCountries` always use the local list.
-
-When `countrySearchUrl` is set and no country filters are active, browser-side country searches call the configured endpoint with `q`, `page`, and `limit` query parameters. The endpoint must return `CountrySearchResponse`.
-
-Applications must provide Angular HTTP when using a remote country endpoint:
-
-```ts
-import { provideHttpClient, withFetch } from '@angular/common/http';
-
-bootstrapApplication(App, {
-  providers: [provideHttpClient(withFetch())],
-});
 ```
 
 During server rendering, the component falls back to the local country list.
@@ -419,6 +418,7 @@ interface StateTemplateContext {
 type PhoneInputValue = PhoneNumberValue | string | null;
 type FlagMode = 'emoji' | 'image';
 type FlagUrlResolver = (countryCode: string) => string;
+type CountrySearchField = 'name' | 'code' | 'dialCode';
 interface NgTelInputAutocompleteConfig {
   /* see Provider API */
 }
@@ -443,4 +443,34 @@ The root-provided service is public for applications that need the same parsing 
 | `formatE164(phoneNumber, countryCode)`           | `string`                            | Formats as E.164.                                                |
 | `formatNational(phoneNumber, countryCode)`       | `string`                            | Formats in national form.                                        |
 | `formatInternational(phoneNumber, countryCode)`  | `string`                            | Formats in international display form.                           |
+| `getValidationErrorReason(phoneNumber, countryCode)` | `string \| null`               | Returns the validation failure reason when available.             |
 | `highlightMatch(text, query)`                    | `string`                            | Escapes text and wraps matching content for highlighted display. |
+
+## Security and Content Security Policy (CSP)
+
+The component works with strict CSP configurations:
+
+- **Script Safety**: No `eval()` or dynamic code compilation. Compatible with strict `script-src 'self'`.
+- **Dynamic Styling**: Like all Angular components, it generates styling dynamically. If the application has a strict `style-src` policy (without `'unsafe-inline'`), you must configure a nonce.
+
+### Dynamic Style Nonces
+
+Provide the `CSP_NONCE` token or use the `ngCspNonce` attribute to assign nonces to injected styles.
+
+```ts
+import { bootstrapApplication, CSP_NONCE } from '@angular/core';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    {
+      provide: CSP_NONCE,
+      useValue: 'YOUR_RANDOM_NONCE',
+    },
+  ],
+});
+```
+
+
+
+

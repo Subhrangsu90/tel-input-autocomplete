@@ -10,12 +10,15 @@ export const NG_TEL_INPUT_AUTOCOMPLETE_DEFAULT_CONFIG: NgTelInputAutocompleteCon
   excludedCountries: [],
   preferredCountries: [],
   formatOnInput: true,
+  autoSelectCountryOnDialCode: true,
+  countrySearchFields: ['name', 'code', 'dialCode'],
   outputFormat: 'string',
   autocomplete: 'tel',
   inputMode: 'tel',
   suggestionsEnabled: true,
   contactSearchEnabled: true,
   validationEnabled: true,
+  validationMessage: 'Invalid phone number',
   minQueryLength: null,
   delay: null,
   completeOnFocus: true,
@@ -49,3 +52,5 @@ export function provideNgTelInputAutocomplete(
     },
   ];
 }
+
+

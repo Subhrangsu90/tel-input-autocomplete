@@ -49,6 +49,7 @@ import {
   AutoCompleteOverlayEvent,
   AutoCompleteSelectEvent,
   CountrySearchResponse,
+  CountrySearchField,
   Country,
   CountrySelectEvent,
   CountryTemplateContext,
@@ -112,7 +113,16 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   readonly allowedCountries = input<readonly string[]>(this.config.allowedCountries);
   readonly excludedCountries = input<readonly string[]>(this.config.excludedCountries);
   readonly preferredCountries = input<readonly string[]>(this.config.preferredCountries);
-  readonly formatOnInput = input<boolean, unknown>(this.config.formatOnInput, { transform: booleanAttribute });
+  readonly formatOnInput = input<boolean, unknown>(this.config.formatOnInput, {
+    transform: booleanAttribute,
+  });
+  readonly autoSelectCountryOnDialCode = input<boolean, unknown>(
+    this.config.autoSelectCountryOnDialCode,
+    { transform: booleanAttribute },
+  );
+  readonly countrySearchFields = input<readonly CountrySearchField[]>(
+    this.config.countrySearchFields,
+  );
   readonly outputFormat = input<'string' | 'object'>(this.config.outputFormat);
   readonly name = input<string | null>(null);
   readonly autocomplete = input(this.config.autocomplete);
@@ -145,6 +155,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   readonly validationEnabled = input(this.config.validationEnabled, {
     transform: booleanAttribute,
   });
+  readonly validationMessage = input(this.config.validationMessage);
   readonly minQueryLength = input<number | null, unknown>(this.config.minQueryLength, {
     transform: numberAttribute,
   });
@@ -279,12 +290,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
 
     if (query) {
       const q = query.toLowerCase().trim();
-      list = list.filter(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          c.dialCode.toLowerCase().includes(q) ||
-          c.code.toLowerCase().includes(q),
-      );
+      list = list.filter((country) => this.countryMatchesQuery(country, q));
       return list.map((c) => ({ ...c, isPreferred: false }));
     }
 
@@ -311,6 +317,22 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     }
 
     return list.map((c) => ({ ...c, isPreferred: false }));
+  }
+
+  private countryMatchesQuery(country: Country, query: string): boolean {
+    const fields = this.countrySearchFields();
+    const activeFields = fields.length > 0 ? fields : this.config.countrySearchFields;
+
+    return activeFields.some((field) => {
+      switch (field) {
+        case 'name':
+          return country.name.toLowerCase().includes(query);
+        case 'code':
+          return country.code.toLowerCase().includes(query);
+        case 'dialCode':
+          return country.dialCode.toLowerCase().includes(query);
+      }
+    });
   }
 
   private getCountries(
@@ -697,7 +719,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   onInputChange(event: Event): void {
     if (this.isReadOnly()) return;
 
-    const value = (event.target as HTMLInputElement).value;
+    const value = this.normalizePastedValue((event.target as HTMLInputElement).value);
 
     if (value.startsWith('+') && !this.isOpen()) {
       this.setCountryOverlayOpen(true);
@@ -708,6 +730,13 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     if (value.startsWith('+') && value.length > 1) {
       const detected = this.phoneService.detectCountryByDialCode(value);
       if (detected) {
+        if (!this.autoSelectCountryOnDialCode()) {
+          this.suggestedCountry.set(detected);
+          this.inputValue.set(value);
+          this.propagateChanges();
+          this.updateSuggestionsState(this.inputValue(), event);
+          return;
+        }
         this.selectedCountry.set(detected);
         const cleanInput = value.replace(detected.dialCode, '').replace('+', '');
         const rawDigits = cleanInput.replace(/\D/g, '');
@@ -829,6 +858,32 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
 
   private isContactSearchQuery(value = this.inputValue()): boolean {
     return this.contactSearchEnabled() && /[a-zA-Z]/.test(value);
+  }
+
+  private normalizePastedValue(value: string): string {
+    let normalized = value.trim().replace(/^tel:/i, '').split(/[;?]/)[0].trim();
+
+    if (/[a-zA-Z]/.test(normalized)) {
+      return normalized;
+    }
+
+    normalized = normalized.replace(/^(?:00)+/, '+');
+    const hasLeadingPlus = normalized.startsWith('+');
+    const digits = normalized.replace(/\D/g, '');
+    return hasLeadingPlus ? '+' + digits : digits;
+  }
+
+  onPaste(event: ClipboardEvent): void {
+    if (this.isReadOnly()) return;
+
+    const pasted = event.clipboardData?.getData('text');
+    if (!pasted) return;
+
+    const normalized = this.normalizePastedValue(pasted);
+    if (normalized === pasted) return;
+
+    event.preventDefault();
+    this.onInputChange({ target: { value: normalized } } as unknown as Event);
   }
 
   private formatDigitsForCountry(value: string, country: Country): string {
@@ -1028,3 +1083,4 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
     }
   }
 }
+

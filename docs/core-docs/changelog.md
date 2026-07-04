@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1 - 2026-07-04
+
+- **Content Security Policy (CSP)**: Certified compatibility with strict CSP environments (no dynamic execution like `eval()`) and added detailed guides for configuring style nonces using the `CSP_NONCE` injection token or `ngCspNonce` root attribute.
+- **Dial-code Detection Controls**: Added `autoSelectCountryOnDialCode`, `countrySearchFields`, `validationMessage`, and paste normalization for `tel:` and `00` international formats.
+- **Documentation Accuracy**: Synced docs for `preferredCountries`, `formatOnInput`, structured validation errors, README badges, and install examples.
+
 ## 1.0.0 - 2026-07-04
 
 - **Preferred Countries list (`preferredCountries`)**: Added support to prioritize specific countries at the top of the dropdown, separated by a separator line, for quicker navigation.
@@ -43,3 +49,4 @@ All notable changes to this project will be documented in this file.
 - Added SSR-safe country fallback behavior and public package documentation.
 - Added customizable country, suggestion, empty, and loading templates.
 - Added a structured API reference for properties, emitters, templates, interfaces, and service methods.
+

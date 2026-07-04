@@ -81,4 +81,24 @@ describe('NgTelInputDropdown', () => {
 
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' });
   });
+  it('should escape highlighted result text before rendering with innerHTML', async () => {
+    fixture.componentRef.setInput('items', [
+      {
+        name: '<img src=x onerror=alert(1)>India',
+        code: 'IN',
+        dialCode: '+91',
+        flag: '🇮🇳',
+        format: '',
+        placeholder: '081234 56789',
+      },
+    ]);
+    fixture.componentRef.setInput('searchQuery', 'India');
+    await fixture.whenStable();
+
+    const label = fixture.nativeElement.querySelector('.ngti-primary') as HTMLElement;
+    expect(label.querySelector('img')).toBeNull();
+    expect(label.textContent).toContain('<img src=x onerror=alert(1)>India');
+    expect(label.querySelector('mark')?.textContent).toBe('India');
+  });
 });
+

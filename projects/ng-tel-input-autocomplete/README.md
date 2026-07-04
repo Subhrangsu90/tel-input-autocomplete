@@ -1,5 +1,10 @@
 # ng-tel-input-autocomplete
 
+[![npm version](https://img.shields.io/npm/v/ng-tel-input-autocomplete.svg)](https://www.npmjs.com/package/ng-tel-input-autocomplete)
+[![Angular](https://img.shields.io/badge/angular-21-dd0031.svg)](https://angular.dev/)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/ng-tel-input-autocomplete.svg)](https://bundlephobia.com/package/ng-tel-input-autocomplete)
+
 Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
 
 ## Compatibility
@@ -64,13 +69,16 @@ export const appConfig: ApplicationConfig = {
       validationEnabled: true,
       suggestionsEnabled: true,
       resetCountryOnClear: false,
+      preferredCountries: ['IN', 'US'],
+      autoSelectCountryOnDialCode: true,
+      countrySearchFields: ['name', 'code', 'dialCode'],
       size: 'small',
     }),
   ],
 };
 ```
 
-Configurable defaults include `defaultCountry`, `allowedCountries`, `excludedCountries`, `outputFormat`, `autocomplete`, `inputMode`, `suggestionsEnabled`, `contactSearchEnabled`, `validationEnabled`, `minQueryLength`, `delay`, `completeOnFocus`, `showClear`, `resetCountryOnClear`, `fluid`, `variant`, `size`, `flagMode`, and `flagUrl`.
+Configurable defaults include `defaultCountry`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `formatOnInput`, `autoSelectCountryOnDialCode`, `countrySearchFields`, `outputFormat`, `autocomplete`, `inputMode`, `suggestionsEnabled`, `contactSearchEnabled`, `validationEnabled`, `validationMessage`, `minQueryLength`, `delay`, `completeOnFocus`, `showClear`, `resetCountryOnClear`, `fluid`, `variant`, `size`, `flagMode`, and `flagUrl`.
 
 ## Reactive Forms
 
@@ -138,13 +146,15 @@ Import `FormsModule` in the consuming component.
 
 ## Country filtering and layout direction
 
-Use ISO 3166-1 alpha-2 country codes for country filtering:
+Use ISO 3166-1 alpha-2 country codes for country filtering. `preferredCountries` moves frequently used countries to the top of the unfiltered list, and `countrySearchFields` can limit local search to names, ISO codes, dial codes, or any combination of those fields:
 
 ```html
 <ng-tel-input-autocomplete
   defaultCountry="IN"
   [allowedCountries]="['IN', 'US', 'GB']"
   [excludedCountries]="['GB']"
+  [preferredCountries]="['IN', 'US']"
+  [countrySearchFields]="['name', 'dialCode']"
 />
 ```
 
@@ -194,7 +204,7 @@ interface PhoneNumberValue {
 }
 ```
 
-Invalid non-empty values produce `{ invalidPhoneNumber: true }`. Set `[validationEnabled]="false"` to disable the library validator.
+Invalid non-empty values produce `{ invalidPhoneNumber: { invalid: true, reason: 'TOO_SHORT' | 'TOO_LONG' | 'INVALID_COUNTRY_CODE' | 'INVALID_LENGTH' } }`. Set `[validationEnabled]="false"` to disable the library validator, or set `validationMessage` to customize the screen-reader-only error text.
 
 For typed forms, use `FormControl<PhoneInputValue>` when the control may emit strings, objects, or `null`. If your app fixes `outputFormat="string"`, `FormControl<string | null>` is also appropriate; with `outputFormat="object"`, use `FormControl<PhoneNumberValue | null>`.
 
@@ -275,7 +285,49 @@ Emoji flags avoid network requests and work with strict Content Security Policie
 readonly flagUrl = (code: string) => `/assets/flags/${code.toLowerCase()}.svg`;
 ```
 
-If image mode is selected without a resolver, the component falls back to `https://flagcdn.com/{code}.svg`.
+## Dial-code detection and paste normalization
+
+International values such as `+12025550143`, `00919876543210`, and `tel:+44-20-7946-0958` are normalized before parsing. By default, typing or pasting a recognized international dial code switches the selected country automatically. Set `[autoSelectCountryOnDialCode]="false"` to keep the current country selected and show the detected-country prompt instead.
+
+## Content Security Policy (CSP)
+
+The library is designed to be fully compatible with strict Content Security Policies (CSP):
+
+- **No eval or dynamic compilation**: The library does not use `eval()`, `new Function()`, or any other dynamic script execution mechanisms. It functions perfectly with a strict `script-src 'self'` policy (no `'unsafe-eval'` required).
+- **Network-free by default**: The default `flagMode="emoji"` relies purely on Unicode emojis, avoiding any external image requests. This works out-of-the-box with a strict `img-src 'self'` policy.
+  - If you switch to `flagMode="image"` and use the default fallback, you must add `https://flagcdn.com` to your `img-src` policy.
+- **Strict Style Policies (Style Nonces)**: To comply with a strict `style-src` policy (without `'unsafe-inline'`), you must supply Angular with a nonce. The library's component styles will automatically receive this nonce.
+
+### Configuring style nonces
+
+You can pass the CSP nonce to Angular in one of two ways:
+
+1. **Using the `ngCspNonce` attribute** on the root application element (suitable for server-rendered pages):
+   ```html
+   <app-root ngCspNonce="YOUR_RANDOM_NONCE"></app-root>
+   ```
+
+2. **Providing the `CSP_NONCE` injection token** during application bootstrap (suitable for client-rendered applications):
+   ```ts
+   import { bootstrapApplication, CSP_NONCE } from '@angular/core';
+   import { AppComponent } from './app/app.component';
+
+   bootstrapApplication(AppComponent, {
+     providers: [
+       {
+         provide: CSP_NONCE,
+         useValue: 'YOUR_RANDOM_NONCE',
+       },
+     ],
+   });
+   ```
+
+For static configurations, you can enable `autoCsp` in your `angular.json` configuration under build options:
+```json
+"security": {
+  "autoCsp": true
+}
+```
 
 ## Accessibility checklist
 
@@ -305,3 +357,4 @@ The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the
 ## License
 
 MIT
+

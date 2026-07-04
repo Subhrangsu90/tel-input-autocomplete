@@ -449,6 +449,9 @@ describe('NgTelInputAutocomplete', () => {
           validationEnabled: false,
           resetCountryOnClear: true,
           size: 'small',
+          autoSelectCountryOnDialCode: false,
+          countrySearchFields: ['code'],
+          validationMessage: 'Use a complete phone number',
         }),
       ],
     }).compileComponents();
@@ -464,6 +467,9 @@ describe('NgTelInputAutocomplete', () => {
     expect(configured.validationEnabled()).toBe(false);
     expect(configured.resetCountryOnClear()).toBe(true);
     expect(configured.size()).toBe('small');
+    expect(configured.autoSelectCountryOnDialCode()).toBe(false);
+    expect(configured.countrySearchFields()).toEqual(['code']);
+    expect(configured.validationMessage()).toBe('Use a complete phone number');
 
     configuredFixture.destroy();
   });
@@ -566,4 +572,54 @@ describe('NgTelInputAutocomplete', () => {
     component.onInputChange({ target: inputElement } as any);
     expect(component.inputValue()).toBe('2025550124');
   });
+  it('should render a custom validation message for assistive technology', async () => {
+    fixture.componentRef.setInput('validationMessage', 'Enter a valid international phone number');
+    component.hasError.set(true);
+    await fixture.whenStable();
+
+    const error = fixture.nativeElement.querySelector(`#${component.inputId()}-error`);
+    expect(error?.textContent?.trim()).toBe('Enter a valid international phone number');
+  });
+
+  it('should restrict local country search to configured fields', async () => {
+    fixture.componentRef.setInput('countrySearchFields', ['name']);
+    await fixture.whenStable();
+
+    expect(component['getFilteredStaticCountries']('+91')).toEqual([]);
+
+    fixture.componentRef.setInput('countrySearchFields', ['dialCode']);
+    await fixture.whenStable();
+
+    expect(
+      component['getFilteredStaticCountries']('+91').some((country) => country.code === 'IN'),
+    ).toBe(true);
+  });
+
+  it('should suggest instead of auto-selecting a country when dial-code auto-select is disabled', async () => {
+    fixture.componentRef.setInput('defaultCountry', 'US');
+    fixture.componentRef.setInput('autoSelectCountryOnDialCode', false);
+    await fixture.whenStable();
+
+    component.onInputChange({ target: { value: '+201001234567' } } as unknown as Event);
+
+    expect(component.selectedCountry()?.code).toBe('US');
+    expect(component.suggestedCountry()?.code).toBe('EG');
+    expect(component.inputValue()).toBe('+201001234567');
+  });
+
+  it('should normalize pasted telephone values before applying country detection', async () => {
+    const preventDefault = vi.fn();
+    const event = {
+      clipboardData: { getData: () => 'tel:+91 98765 43210;phone-context=example.com' },
+      preventDefault,
+    } as unknown as ClipboardEvent;
+
+    component.onPaste(event);
+    await fixture.whenStable();
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(component.selectedCountry()?.code).toBe('IN');
+    expect(component.inputValue().replace(/\s/g, '')).toBe('9876543210');
+  });
 });
+

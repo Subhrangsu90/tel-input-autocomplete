@@ -210,6 +210,14 @@
     white-space: nowrap;
 }
 
+
+.ngti-highlight {
+    border-radius: .2rem;
+    background: var(--ngti-color-highlight-bg, #dbeafe);
+    color: var(--ngti-color-highlight-text, #172554);
+    font-weight: 700;
+    padding: 0 .05rem;
+}
 .ngti-secondary {
     color: var(--ngti-color-text-muted);
     font-family: var(--ngti-font-mono);

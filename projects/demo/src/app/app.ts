@@ -221,7 +221,7 @@ import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomple
 })
 export class App {
   onValueChange(value: PhoneInputValue) {
-    console.log('Object format emitted:', value);
+    // Update component state, analytics, or a preview panel here.
   }
 }`;
 
@@ -465,3 +465,4 @@ export class App {
     }, 600);
   }
 }
+

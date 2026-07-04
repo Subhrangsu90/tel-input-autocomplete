@@ -90,6 +90,7 @@ export interface AutoCompleteLazyLoadEvent {
 export type PhoneInputValue = PhoneNumberValue | string | null;
 export type FlagMode = 'emoji' | 'image';
 export type FlagUrlResolver = (countryCode: string) => string;
+export type CountrySearchField = 'name' | 'code' | 'dialCode';
 
 export interface NgTelInputAutocompleteConfig {
   defaultCountry: string;
@@ -97,12 +98,15 @@ export interface NgTelInputAutocompleteConfig {
   excludedCountries: readonly string[];
   preferredCountries: readonly string[];
   formatOnInput: boolean;
+  autoSelectCountryOnDialCode: boolean;
+  countrySearchFields: readonly CountrySearchField[];
   outputFormat: 'string' | 'object';
   autocomplete: string;
   inputMode: string;
   suggestionsEnabled: boolean;
   contactSearchEnabled: boolean;
   validationEnabled: boolean;
+  validationMessage: string;
   minQueryLength: number | null;
   delay: number | null;
   completeOnFocus: boolean;
@@ -119,3 +123,5 @@ export type NgTelInputAutocompleteConfigInput = Partial<NgTelInputAutocompleteCo
 export type NgTelInputClassValue =
   string | readonly string[] | Set<string> | Record<string, boolean | null | undefined>;
 export type NgTelInputStyleValue = Record<string, string | number | null | undefined>;
+
+

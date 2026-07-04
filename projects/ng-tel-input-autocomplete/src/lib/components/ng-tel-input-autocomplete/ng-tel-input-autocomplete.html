@@ -116,7 +116,7 @@
 </div>
 
 @if (isInvalid()) {
-  <span class="ngti-sr-only" [id]="inputId() + '-error'" role="alert">Invalid phone number</span>
+  <span class="ngti-sr-only" [id]="inputId() + '-error'" role="alert">{{ validationMessage() }}</span>
 }
 
 @if (suggestedCountry(); as suggested) {
@@ -210,3 +210,4 @@
     (closed)="closeSuggestions()"
   />
 </ng-template>
+
