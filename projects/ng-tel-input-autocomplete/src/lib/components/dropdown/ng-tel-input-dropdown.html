@@ -138,7 +138,7 @@
                 @if (flagMode() === 'image') {
                   <img class="ngti-flag-image ngti-size-small" [src]="getFlagUrl(suggestion.countryCode)" alt="" referrerpolicy="no-referrer" />
                 } @else {
-                  <span aria-hidden="true">{{ flagEmoji(suggestion.countryCode) }}</span>
+                  <span class="ngti-flag-emoji" aria-hidden="true">{{ flagEmoji(suggestion.countryCode) }}</span>
                 }
                 {{ suggestion.countryCode.toUpperCase() }}
               </span>
