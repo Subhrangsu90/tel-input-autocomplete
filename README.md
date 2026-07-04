@@ -6,7 +6,7 @@ This repository contains the published Angular library, GitBook-ready documentat
 
 ## Project Links
 
-- Repository: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
+- Repository: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
 - Library source: [projects/ng-tel-input-autocomplete](./projects/ng-tel-input-autocomplete)
 - GitBook docs source: [docs](./docs)
 - Library README: [projects/ng-tel-input-autocomplete/README.md](./projects/ng-tel-input-autocomplete/README.md)

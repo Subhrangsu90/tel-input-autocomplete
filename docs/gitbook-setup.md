@@ -24,7 +24,7 @@ That means GitBook will use:
 
 1. Open GitBook and create or open a space.
 2. Enable Git Sync for GitHub.
-3. Select `Subhrangsu90/my-workspace` as the repository.
+3. Select `Subhrangsu90/tel-input-autocomplete` as the repository.
 4. Keep the project directory as the repository root so GitBook can find `.gitbook.yaml`.
 5. Sync the space.
 

@@ -85,5 +85,5 @@ Also verify that your backend returns the expected pagination and data structure
 ## Support & Feedback
 
 For bug reports, feature requests, or contribution guidelines:
-- **GitHub Issues**: Submit issues on [GitHub Issues](https://github.com/Subhrangsu90/my-workspace/issues)
-- **Discussion Board**: Ask questions on [GitHub Discussions](https://github.com/Subhrangsu90/my-workspace/discussions)
+- **GitHub Issues**: Submit issues on [GitHub Issues](https://github.com/Subhrangsu90/tel-input-autocomplete/issues)
+- **Discussion Board**: Ask questions on [GitHub Discussions](https://github.com/Subhrangsu90/tel-input-autocomplete/discussions)

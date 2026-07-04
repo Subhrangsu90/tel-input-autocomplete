@@ -298,8 +298,8 @@ The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the
 
 ## Links
 
-- Repository: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
-- Library source: [projects/ng-tel-input-autocomplete](https://github.com/Subhrangsu90/my-workspace/tree/master/projects/ng-tel-input-autocomplete)
+- Repository: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
+- Library source: [projects/ng-tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete/tree/master/projects/ng-tel-input-autocomplete)
 - npm package: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
 
 ## License

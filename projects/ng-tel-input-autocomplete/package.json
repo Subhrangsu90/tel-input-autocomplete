@@ -35,10 +35,10 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Subhrangsu90/my-workspace/tree/master/projects/ng-tel-input-autocomplete"
+    "url": "https://github.com/Subhrangsu90/tel-input-autocomplete/tree/master/projects/ng-tel-input-autocomplete"
   },
   "bugs": {
-    "url": "https://github.com/Subhrangsu90/ng-tel-input-autocomplete/issues"
+    "url": "https://github.com/Subhrangsu90/tel-input-autocomplete/issues"
   },
   "funding": {
     "type": "github",

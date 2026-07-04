@@ -58,5 +58,5 @@ export class PhoneFieldComponent {
 
 ## Repository
 
-* GitHub: [Subhrangsu90/my-workspace](https://github.com/Subhrangsu90/my-workspace)
+* GitHub: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
 * npm: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
