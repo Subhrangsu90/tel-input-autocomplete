@@ -156,12 +156,22 @@ export class NgTelInputAutocompleteService {
    */
   parsePhoneNumber(input: string, country: Country): PhoneNumberValue {
     const rawDigits = input.replace(/\D/g, '');
-    const formatted = this.formatPhoneNumber(rawDigits, country.code);
+    const dialWithoutPlus = country.dialCode.replace('+', '');
+    
+    // Strip dial code from rawDigits to get correct national input for formatting
+    const cleanedDigits = rawDigits.startsWith(dialWithoutPlus)
+      ? rawDigits.substring(dialWithoutPlus.length)
+      : rawDigits;
+    const formatted = this.formatPhoneNumber(cleanedDigits, country.code);
 
     try {
       let parseInput = input;
-      if (!input.startsWith('+') && !input.startsWith(country.dialCode)) {
-        parseInput = `${country.dialCode}${rawDigits}`;
+      if (!input.startsWith('+')) {
+        if (rawDigits.startsWith(dialWithoutPlus)) {
+          parseInput = `+${rawDigits}`;
+        } else {
+          parseInput = `${country.dialCode}${rawDigits}`;
+        }
       }
       const parsed = this.phoneUtil.parseAndKeepRawInput(parseInput, country.code.toUpperCase());
       const formattedNational = this.phoneUtil.format(parsed, lpn.PhoneNumberFormat.NATIONAL);
@@ -172,7 +182,7 @@ export class NgTelInputAutocompleteService {
       const formattedE164 = this.phoneUtil.format(parsed, lpn.PhoneNumberFormat.E164);
 
       return {
-        number: parsed.getNationalNumber()?.toString() || rawDigits,
+        number: parsed.getNationalNumber()?.toString() || cleanedDigits,
         internationalNumber: formattedInternational,
         nationalNumber: formattedNational,
         e164Number: formattedE164,
@@ -181,10 +191,10 @@ export class NgTelInputAutocompleteService {
       };
     } catch {
       return {
-        number: rawDigits,
+        number: cleanedDigits,
         internationalNumber: `${country.dialCode} ${formatted}`.trim(),
         nationalNumber: formatted,
-        e164Number: `${country.dialCode}${rawDigits}`,
+        e164Number: `${country.dialCode}${cleanedDigits}`,
         countryCode: country.code,
         dialCode: country.dialCode,
       };
@@ -236,7 +246,13 @@ export class NgTelInputAutocompleteService {
           (c) => c.code.toUpperCase() === countryCode.toUpperCase(),
         );
         if (staticC) {
-          checkInput = `${staticC.dialCode}${phoneNumber.replace(/\D/g, '')}`;
+          const dialWithoutPlus = staticC.dialCode.replace('+', '');
+          const cleaned = phoneNumber.replace(/\D/g, '');
+          if (cleaned.startsWith(dialWithoutPlus)) {
+            checkInput = `+${cleaned}`;
+          } else {
+            checkInput = `${staticC.dialCode}${cleaned}`;
+          }
         }
       }
       const parsedNumber = this.phoneUtil.parseAndKeepRawInput(

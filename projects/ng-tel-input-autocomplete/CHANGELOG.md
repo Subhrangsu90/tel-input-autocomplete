@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.2 - 2026-07-04
+
+- Fixed duplicate country dial code prefixing when parsing or validating raw subscriber numbers that start with a dial code.
+- Enhanced `writeValue()` to support fallback value extraction from `e164Number` and `internationalNumber` object fields.
+- Fixed `writeValue()` to cleanly strip dial code prefixes before formatting subscriber numbers.
+
 ## 0.1.1 - 2026-07-04
 
 - Renamed repository to `tel-input-autocomplete` and updated all repository, issue tracker, and documentation URL references.

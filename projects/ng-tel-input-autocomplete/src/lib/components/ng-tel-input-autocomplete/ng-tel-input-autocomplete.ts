@@ -872,7 +872,12 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
       const phoneValue = value as Partial<PhoneNumberValue> & { code?: string; formattedNumber?: string };
       const countryCode = phoneValue.countryCode || phoneValue.code;
       const numberToFormat =
-        phoneValue.number || phoneValue.nationalNumber || phoneValue.formattedNumber || '';
+        phoneValue.number ||
+        phoneValue.nationalNumber ||
+        phoneValue.e164Number ||
+        phoneValue.internationalNumber ||
+        phoneValue.formattedNumber ||
+        '';
 
       if (countryCode) {
         const found = this.phoneService
@@ -880,7 +885,17 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
           .find((c) => c.code.toUpperCase() === countryCode.toUpperCase());
         if (found) {
           this.selectedCountry.set(found);
-          this.inputValue.set(this.formatDigitsForCountry(numberToFormat, found));
+          
+          let cleanNumber = numberToFormat;
+          if (cleanNumber.startsWith('+')) {
+            cleanNumber = cleanNumber.substring(1);
+          }
+          const dialWithoutPlus = found.dialCode.replace('+', '');
+          if (cleanNumber.startsWith(dialWithoutPlus)) {
+            cleanNumber = cleanNumber.substring(dialWithoutPlus.length);
+          }
+
+          this.inputValue.set(this.formatDigitsForCountry(cleanNumber, found));
           this.validateSelf();
           return;
         }

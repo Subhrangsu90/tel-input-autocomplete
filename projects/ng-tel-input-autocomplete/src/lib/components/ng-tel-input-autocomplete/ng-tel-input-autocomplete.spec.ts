@@ -495,4 +495,44 @@ describe('NgTelInputAutocomplete', () => {
 
     hostFixture.destroy();
   });
+
+  it('should support writeValue with object containing e164Number or internationalNumber and strip dial code', async () => {
+    fixture.componentRef.setInput('defaultCountry', 'IN');
+    await fixture.whenStable();
+
+    // Test writeValue with e164Number object and verify dial code is stripped from display number
+    component.writeValue({ countryCode: 'EG', e164Number: '+201001234567' });
+    expect(component.selectedCountry()?.code).toBe('EG');
+    expect(component.inputValue().replace(/\s/g, '')).toBe('1001234567');
+
+    // Test writeValue with internationalNumber object
+    component.writeValue({ countryCode: 'SA', internationalNumber: '+966 50 123 4567' });
+    expect(component.selectedCountry()?.code).toBe('SA');
+    expect(component.inputValue().replace(/\s/g, '')).toBe('501234567');
+
+    // Test writeValue with number containing duplicate-prone format
+    component.writeValue({ countryCode: 'SA', number: '966501234567' });
+    expect(component.selectedCountry()?.code).toBe('SA');
+    expect(component.inputValue().replace(/\s/g, '')).toBe('501234567');
+  });
+
+  it('should parse phone numbers with raw dial codes in parsePhoneNumber without duplicate dial codes', () => {
+    const service = component['phoneService'];
+    const saCountry = service.getStaticCountries().find(c => c.code === 'SA')!;
+    
+    // Test input starting with dial code but no '+'
+    const parsed = service.parsePhoneNumber('966501234567', saCountry);
+    expect(parsed.number).toBe('501234567');
+    expect(parsed.e164Number).toBe('+966501234567');
+    expect(parsed.dialCode).toBe('+966');
+
+    // Test input starting with dial code with '+'
+    const parsedWithPlus = service.parsePhoneNumber('+966501234567', saCountry);
+    expect(parsedWithPlus.number).toBe('501234567');
+    expect(parsedWithPlus.e164Number).toBe('+966501234567');
+
+    // Test validation with dial code but no '+'
+    expect(service.isValidNumber('966501234567', 'SA')).toBe(true);
+    expect(service.isValidNumber('+966501234567', 'SA')).toBe(true);
+  });
 });
