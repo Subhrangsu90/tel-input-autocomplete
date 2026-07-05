@@ -53,7 +53,7 @@
   "devDependencies": {
     "@angular/build": "^21.2.18",
     "@angular/cli": "^21.0.4",
-    "@angular/compiler-cli": "^21.0.0",
+    "@angular/compiler-cli": "^22.0.5",
     "@types/express": "^5.0.1",
     "@types/google-libphonenumber": "^7.4.30",
     "@types/node": "^20.17.19",
