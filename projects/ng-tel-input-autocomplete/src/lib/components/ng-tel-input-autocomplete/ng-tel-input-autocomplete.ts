@@ -33,7 +33,7 @@ import {
   NgControl,
   NgForm,
 } from '@angular/forms';
-import { OverlayModule } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, OverlayModule } from '@angular/cdk/overlay';
 import { Subject, of, Observable, timer } from 'rxjs';
 import { debounce, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -211,6 +211,8 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   // Element references
   phoneInput = viewChild<ElementRef<HTMLInputElement>>('phoneInput');
   containerEl = viewChild<ElementRef<HTMLDivElement>>('containerEl');
+  readonly countryOverlay = viewChild<CdkConnectedOverlay>('countryOverlay');
+  readonly suggestionsOverlay = viewChild<CdkConnectedOverlay>('suggestionsOverlay');
 
   // Reactive State (Signals)
   countries = signal<Country[]>([]);
@@ -532,6 +534,27 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   }
 
   onSearchChanged(query: string): void {
+    let normalizedQuery = query.trim();
+    if (normalizedQuery.startsWith('00')) {
+      normalizedQuery = '+' + normalizedQuery.slice(2);
+    }
+    if (this.autoSelectCountryOnDialCode() && normalizedQuery.startsWith('+') && normalizedQuery.length > 1) {
+      const detected = this.phoneService.detectCountryByDialCode(normalizedQuery);
+      if (detected) {
+        this.selectedCountry.set(detected);
+        this.closeOverlay();
+        const cleanInput = normalizedQuery.replace(detected.dialCode, '').replace('+', '');
+        const rawDigits = cleanInput.replace(/\D/g, '');
+        this.inputValue.set(
+          this.formatOnInput()
+            ? this.phoneService.formatPhoneNumber(rawDigits, detected.code)
+            : rawDigits,
+        );
+        this.suggestedCountry.set(null);
+        this.propagateChanges();
+        return;
+      }
+    }
     this.searchSubject.next(query);
   }
 
@@ -738,6 +761,7 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
           return;
         }
         this.selectedCountry.set(detected);
+        this.closeOverlay();
         const cleanInput = value.replace(detected.dialCode, '').replace('+', '');
         const rawDigits = cleanInput.replace(/\D/g, '');
         this.inputValue.set(
@@ -1008,6 +1032,32 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
           return;
         }
       }
+
+      // Fallback: If no countryCode was supplied, try to auto-detect country from dial code in the phone number
+      if (!countryCode && numberToFormat) {
+        let cleanNumber = numberToFormat.trim();
+        if (cleanNumber.startsWith('+') || cleanNumber.startsWith('00')) {
+          const checkVal = cleanNumber.startsWith('00') ? cleanNumber.slice(2) : cleanNumber;
+          const detected = this.phoneService.detectCountryByDialCode(checkVal);
+          if (detected) {
+            this.selectedCountry.set(detected);
+            const digitsOnly = checkVal.replace(detected.dialCode, '').replace('+', '');
+            const rawDigits = digitsOnly.replace(/\D/g, '');
+            this.inputValue.set(
+              this.formatOnInput()
+                ? this.formatDigitsForCountry(rawDigits, detected)
+                : rawDigits,
+            );
+            this.validateSelf();
+            return;
+          }
+        }
+      }
+
+      // Safeguard against stringifying the raw object to "[object Object]"
+      this.inputValue.set('');
+      this.validateSelf();
+      return;
     }
 
     if (typeof value === 'string' && value.startsWith('+')) {
@@ -1080,6 +1130,27 @@ export class NgTelInputAutocomplete implements OnInit, ControlValueAccessor, Val
   onEscapePress(): void {
     if (this.isOpen()) {
       this.closeOverlay();
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateOverlaySizes();
+  }
+
+  private updateOverlaySizes(): void {
+    const width = this.getOverlayWidth();
+
+    const countryOverlayRef = this.countryOverlay()?.overlayRef;
+    if (countryOverlayRef && this.isOpen()) {
+      countryOverlayRef.updateSize({ width });
+      countryOverlayRef.updatePosition();
+    }
+
+    const suggestionsOverlayRef = this.suggestionsOverlay()?.overlayRef;
+    if (suggestionsOverlayRef && this.showSuggestions()) {
+      suggestionsOverlayRef.updateSize({ width });
+      suggestionsOverlayRef.updatePosition();
     }
   }
 }

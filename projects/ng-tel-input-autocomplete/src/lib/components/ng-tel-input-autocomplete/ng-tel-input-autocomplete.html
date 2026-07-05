@@ -145,6 +145,7 @@
 }
 
 <ng-template
+  #countryOverlay="cdkConnectedOverlay"
   cdkConnectedOverlay
   [cdkConnectedOverlayOrigin]="trigger"
   [cdkConnectedOverlayOpen]="isOpen()"
@@ -179,6 +180,7 @@
 </ng-template>
 
 <ng-template
+  #suggestionsOverlay="cdkConnectedOverlay"
   cdkConnectedOverlay
   [cdkConnectedOverlayOrigin]="containerOrigin"
   [cdkConnectedOverlayOpen]="showSuggestions()"

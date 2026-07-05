@@ -1,20 +1,8 @@
-@font-face {
-    font-family: 'Twemoji Country Flags';
-    unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
-    src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1/dist/TwemojiCountryFlags.woff2') format('woff2');
-}
-
 :host {
     display: block;
     width: 100%;
     color: var(--ngti-color-text);
     font-family: inherit;
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
 }
 
 .ngti-dropdown {
@@ -24,7 +12,7 @@
     flex-direction: column;
     overflow: hidden;
     border: 1px solid var(--ngti-color-border);
-    border-radius: var(--ngti-radius-md);
+    border-radius: var(--ngti-radius-sm);
     background: var(--ngti-color-surface);
     box-shadow: var(--ngti-shadow-dropdown);
     font-size: .875rem;
@@ -85,8 +73,8 @@
     position: absolute;
     inset-inline-end: 0.35rem;
     display: inline-flex;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: var(--ngti-size-icon-button);
+    height: var(--ngti-size-icon-button);
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -104,11 +92,6 @@
 .ngti-clear-button:hover {
     background: var(--ngti-color-surface-hover);
     color: var(--ngti-color-text);
-}
-
-.ngti-clear-button:focus-visible {
-    outline: 1px solid var(--ngti-color-primary);
-    outline-offset: -1px;
 }
 
 .ngti-icon-button {
@@ -134,6 +117,7 @@
     color: var(--ngti-color-text);
 }
 
+.ngti-clear-button:focus-visible,
 .ngti-icon-button:focus-visible,
 .ngti-option:focus-visible {
     outline: 1px solid var(--ngti-color-primary);
@@ -239,30 +223,6 @@
     white-space: nowrap;
 }
 
-.ngti-flag-emoji {
-    width: var(--ngti-size-flag-width);
-    flex: none;
-    font-size: 1.2rem;
-    line-height: 1;
-    text-align: center;
-    font-family: 'Twemoji Country Flags', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', 'Android Emoji', 'EmojiSymbols', sans-serif;
-}
-
-.ngti-flag-image {
-    width: var(--ngti-size-flag-width);
-    height: var(--ngti-size-flag-height);
-    flex: none;
-    border: 1px solid var(--ngti-color-border);
-    border-radius: var(--ngti-radius-xs);
-    object-fit: cover;
-    box-shadow: 0 1px 1px rgb(15 23 42 / .04);
-}
-
-.ngti-flag-image.ngti-size-small {
-    width: 1.15rem;
-    height: .8rem;
-}
-
 .ngti-selected-icon {
     flex: none;
     color: var(--ngti-color-primary);
@@ -307,7 +267,7 @@
 }
 
 .ngti-empty {
-    padding: 1.5rem;
+    padding: 1rem;
     color: var(--ngti-color-text-muted);
     text-align: center;
 }
@@ -362,7 +322,7 @@
 }
 
 .ngti-divider {
-    height: 1px;
+    height: 0.5px;
     background-color: var(--ngti-color-border-soft, #e2e8f0);
 }
 

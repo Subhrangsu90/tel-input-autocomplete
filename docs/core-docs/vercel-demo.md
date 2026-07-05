@@ -1,5 +1,7 @@
 # Live Demo on Vercel
 
+The live interactive demo is available at: [https://my-workspace-chi-eight.vercel.app](https://my-workspace-chi-eight.vercel.app)
+
 GitBook should host the written documentation. Vercel can still host the Angular live demo app.
 
 ## Vercel settings

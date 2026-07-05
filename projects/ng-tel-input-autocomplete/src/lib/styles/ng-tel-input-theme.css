@@ -3,15 +3,15 @@
   --ngti-color-surface-muted: #fafafa;
   --ngti-color-surface-hover: #f4f4f5;
   --ngti-color-option-active: #f4f4f5;
-  --ngti-color-option-selected: #e4e4e7;
+  --ngti-color-option-selected: #f1f1f1;
   --ngti-color-surface-raised: #ffffff;
   --ngti-color-text: #09090b;
   --ngti-color-text-muted: #52525b;
   --ngti-color-text-soft: #a1a1aa;
-  --ngti-color-border: #e4e4e7;
-  --ngti-color-border-soft: #f4f4f5;
+  --ngti-color-border: #f1f1f1;
+  --ngti-color-border-soft: #e2e2e2;
   --ngti-color-border-strong: #cbd5e1;
-  --ngti-color-primary: #18181b;
+  --ngti-color-primary: #9e9c9c;
   --ngti-color-primary-strong: #09090b;
   --ngti-color-primary-soft: #f4f4f5;
   --ngti-color-primary-border: #cbd5e1;
@@ -58,5 +58,40 @@
   --ngti-shadow-dropdown: 0 8px 18px rgb(15 23 42 / .10), 0 1px 3px rgb(15 23 42 / .08);
   --ngti-transition-fast: 150ms ease;
   --ngti-transition-base: 160ms ease;
+}
+
+@font-face {
+  font-family: 'Twemoji Country Flags';
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
+  src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1/dist/TwemojiCountryFlags.woff2') format('woff2');
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.ngti-flag-emoji {
+  width: var(--ngti-size-flag-width);
+  flex: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+  font-family: 'Twemoji Country Flags', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', 'Android Emoji', 'EmojiSymbols', sans-serif;
+}
+
+.ngti-flag-image {
+  width: var(--ngti-size-flag-width);
+  height: var(--ngti-size-flag-height);
+  flex: none;
+  border: 1px solid var(--ngti-color-border);
+  object-fit: cover;
+  box-shadow: 0 1px 1px rgb(15 23 42 / 0.04);
+}
+
+.ngti-flag-image.ngti-size-small {
+  width: 1.25rem;
+  height: 0.85rem;
 }
 

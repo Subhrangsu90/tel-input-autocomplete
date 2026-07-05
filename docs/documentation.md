@@ -11,6 +11,7 @@ Accessible international telephone input and contact autocomplete for Angular 21
 
 | Library | Angular | Node.js                |
 | ------- | ------- | ---------------------- |
+| 1.0.x   | 21.x    | 20.19+, 22.12+, or 24+ |
 | 0.1.x   | 21.x    | 20.19+, 22.12+, or 24+ |
 
 ## Installation
@@ -221,7 +222,7 @@ Use the class/style inputs to customize the built-in UI while keeping the compon
 ```html
 <ng-tel-input-autocomplete
   containerClass="rounded-phone"
-  [containerStyle]="{ borderColor: '#18181b' }"
+  [containerStyle]="{ borderColor: '#9e9c9c' }"
   inputClass="phone-text"
   [dropdownStyle]="{ maxHeight: '18rem' }"
 />

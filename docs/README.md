@@ -56,7 +56,8 @@ export class PhoneFieldComponent {
 | [Help Center](support/help-center.md)       | FAQs, SSR hydration issues, dropdown overflow clipping, and troubleshooting.                        |
 | [Live Demo](core-docs/vercel-demo.md)       | How to deploy the Angular demo app separately.                                                      |
 
-## Repository
+## Repository & Demo
 
+* Live Playground: [https://my-workspace-chi-eight.vercel.app](https://my-workspace-chi-eight.vercel.app)
 * GitHub: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
 * npm: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)

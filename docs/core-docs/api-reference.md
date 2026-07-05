@@ -218,7 +218,7 @@ Pass class or style inputs when an application needs to adjust the rendered part
 ```html
 <ng-tel-input-autocomplete
   containerClass="rounded-phone"
-  [containerStyle]="{ borderColor: '#18181b' }"
+  [containerStyle]="{ borderColor: '#9e9c9c' }"
   inputClass="phone-text"
   [dropdownStyle]="{ maxHeight: '18rem' }"
 />

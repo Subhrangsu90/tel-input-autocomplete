@@ -621,5 +621,38 @@ describe('NgTelInputAutocomplete', () => {
     expect(component.selectedCountry()?.code).toBe('IN');
     expect(component.inputValue().replace(/\s/g, '')).toBe('9876543210');
   });
+
+  it('should close the country search overlay when auto-selecting country on dial-code input', async () => {
+    component.isOpen.set(true);
+    await fixture.whenStable();
+
+    component.onInputChange({ target: { value: '+919876543210' } } as unknown as Event);
+    await fixture.whenStable();
+
+    expect(component.selectedCountry()?.code).toBe('IN');
+    expect(component.isOpen()).toBe(false);
+  });
+
+  it('should safely handle unknown/invalid object inputs in writeValue without displaying [object Object]', () => {
+    component.writeValue({ foo: 'bar' });
+    expect(component.inputValue()).toBe('');
+  });
+
+  it('should support writeValue with object containing only number with dial code and auto-detect country', () => {
+    component.writeValue({ number: '+447832741417' });
+    expect(component.selectedCountry()?.code).toBe('GB');
+    expect(component.inputValue().replace(/\s/g, '')).toBe('7832741417');
+  });
+
+  it('should auto-select country and close overlay when dial-code is typed into country search input', async () => {
+    component.isOpen.set(true);
+    await fixture.whenStable();
+
+    component.onSearchChanged('+91');
+    await fixture.whenStable();
+
+    expect(component.selectedCountry()?.code).toBe('IN');
+    expect(component.isOpen()).toBe(false);
+  });
 });
 

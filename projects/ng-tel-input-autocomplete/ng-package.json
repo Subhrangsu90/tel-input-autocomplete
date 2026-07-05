@@ -1,9 +1,9 @@
 {
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/ng-tel-input-autocomplete",
-  "assets": ["README.md", "API.md", "LICENSE", "CHANGELOG.md"],
-  "allowedNonPeerDependencies": ["google-libphonenumber", "intl-tel-input"],
+  "assets": ["README.md", "LICENSE", "CHANGELOG.md"],
   "lib": {
     "entryFile": "src/public-api.ts"
   }
 }
+

@@ -6,6 +6,7 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/ng-tel-input-autocomplete.svg)](https://bundlephobia.com/package/ng-tel-input-autocomplete)
 [![Documentation](https://img.shields.io/badge/docs-GitBook-blue)](https://subhrangsu.gitbook.io/ng-tel-input-autocomplete)
+[![Demo](https://img.shields.io/badge/demo-Vercel-success)](https://my-workspace-chi-eight.vercel.app)
 
 Professional Angular library workspace for `ng-tel-input-autocomplete`, an accessible international telephone input with country selection, phone-number formatting, validation, and optional contact autocomplete.
 
@@ -13,6 +14,7 @@ This repository contains the published Angular library, GitBook-ready documentat
 
 ## Project Links
 
+- Demo: [Live Playground](https://my-workspace-chi-eight.vercel.app)
 - Repository: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
 - Library source: [projects/ng-tel-input-autocomplete](./projects/ng-tel-input-autocomplete)
 - GitBook docs source: [docs](./docs)

@@ -5,16 +5,9 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/ng-tel-input-autocomplete.svg)](https://bundlephobia.com/package/ng-tel-input-autocomplete)
 [![Documentation](https://img.shields.io/badge/docs-GitBook-blue)](https://subhrangsu.gitbook.io/ng-tel-input-autocomplete)
+[![Demo](https://img.shields.io/badge/demo-Vercel-success)](https://my-workspace-chi-eight.vercel.app)
 
-Accessible international telephone input and contact autocomplete for Angular 21.
-
-Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
-
-## Compatibility
-
-| Library | Angular | Node.js                |
-| ------- | ------- | ---------------------- |
-| 0.1.x   | 21.x    | 20.19+, 22.12+, or 24+ |
+Accessible international telephone input and contact autocomplete for Angular 21. Supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
 
 ## Installation
 
@@ -22,15 +15,9 @@ Accessible international telephone input and contact autocomplete for Angular 21
 npm install ng-tel-input-autocomplete @angular/cdk
 ```
 
-Angular, Angular Forms, CDK, and RxJS are peer dependencies. The package installs `google-libphonenumber` and `intl-tel-input` for phone metadata, formatting, and validation.
-
-No Tailwind, global stylesheet, or external flag service is required. Styles are encapsulated in the components and emoji flags are the default.
-
-For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md).
+Angular, Angular Forms, CDK, and RxJS are peer dependencies. Optionally install `google-libphonenumber` and `intl-tel-input` for enhanced phone metadata, formatting, and validation.
 
 ## Quick start
-
-Import the standalone component where it is used:
 
 ```ts
 import { Component } from '@angular/core';
@@ -50,311 +37,47 @@ export class PhoneField {
 }
 ```
 
-For template-driven forms, import `FormsModule` and bind with `[(ngModel)]`.
-
 ## Application-wide defaults
 
-Use `provideNgTelInputAutocomplete()` during bootstrap to set product defaults once. Component inputs always override these defaults when provided locally.
-
 ```ts
-import { ApplicationConfig } from '@angular/core';
 import { provideNgTelInputAutocomplete } from 'ng-tel-input-autocomplete';
 
-export const appConfig: ApplicationConfig = {
+export const appConfig = {
   providers: [
     provideNgTelInputAutocomplete({
       defaultCountry: 'IN',
       flagMode: 'emoji',
       validationEnabled: true,
-      suggestionsEnabled: true,
-      resetCountryOnClear: false,
       preferredCountries: ['IN', 'US'],
-      autoSelectCountryOnDialCode: true,
-      countrySearchFields: ['name', 'code', 'dialCode'],
-      size: 'small',
     }),
   ],
 };
 ```
 
-Configurable defaults include `defaultCountry`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `formatOnInput`, `autoSelectCountryOnDialCode`, `countrySearchFields`, `outputFormat`, `autocomplete`, `inputMode`, `suggestionsEnabled`, `contactSearchEnabled`, `validationEnabled`, `validationMessage`, `minQueryLength`, `delay`, `completeOnFocus`, `showClear`, `resetCountryOnClear`, `fluid`, `variant`, `size`, `flagMode`, and `flagUrl`.
-
-## Reactive Forms
-
-```ts
-import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomplete';
-
-@Component({
-  selector: 'app-contact-form',
-
-  imports: [ReactiveFormsModule, NgTelInputAutocomplete],
-  template: `
-    <label for="work-phone">Work phone</label>
-    <ng-tel-input-autocomplete
-      inputId="work-phone"
-      [formControl]="phone"
-      defaultCountry="IN"
-      [suggestionsEnabled]="false"
-    />
-  `,
-})
-export class ContactForm {
-  readonly phone = new FormControl<PhoneInputValue>(null, {
-    validators: [Validators.required],
-  });
-}
-```
-
-## Signal Forms
-
-Angular 21 Signal Forms can consume the component through the same form-control contract used by reactive forms. Keep the field type compatible with the selected output format.
-
-```ts
-import { form, schema, required } from '@angular/forms/signals';
-import { signal } from '@angular/core';
-import { PhoneInputValue } from 'ng-tel-input-autocomplete';
-
-readonly model = signal<{ phone: PhoneInputValue }>({ phone: null });
-readonly contactForm = form(this.model, schema((field) => {
-  required(field.phone);
-}));
-```
-
-```html
-<ng-tel-input-autocomplete
-  inputId="signal-phone"
-  [formField]="contactForm.phone"
-  defaultCountry="US"
-/>
-```
-
-## Template-driven Forms
-
-```html
-<ng-tel-input-autocomplete
-  inputId="mobile-phone"
-  ariaLabel="Mobile phone"
-  [(ngModel)]="phone"
-  name="phone"
-/>
-```
-
-Import `FormsModule` in the consuming component.
-
-## Country filtering and layout direction
-
-Use ISO 3166-1 alpha-2 country codes for country filtering. `preferredCountries` moves frequently used countries to the top of the unfiltered list, and `countrySearchFields` can limit local search to names, ISO codes, dial codes, or any combination of those fields:
-
-```html
-<ng-tel-input-autocomplete
-  defaultCountry="IN"
-  [allowedCountries]="['IN', 'US', 'GB']"
-  [excludedCountries]="['GB']"
-  [preferredCountries]="['IN', 'US']"
-  [countrySearchFields]="['name', 'dialCode']"
-/>
-```
-
-Set `dir="rtl"` or `dir="auto"` when the field appears in right-to-left or mixed-language layouts.
-
 ## Contact autocomplete
-
-The library emits the current query; your application owns the contact source and passes matching suggestions back.
 
 ```html
 <ng-tel-input-autocomplete
   [formControl]="phone"
   [suggestions]="suggestions"
   [suggestionsLoading]="loading"
-  [suggestionsExhausted]="suggestionsExhausted"
   (suggestionSearch)="searchContacts($event)"
   (loadMoreSuggestions)="loadNextPage()"
 />
 ```
 
-```ts
-import { PhoneSuggestion } from 'ng-tel-input-autocomplete';
+## Documentation
 
-suggestions: PhoneSuggestion[] = [
-  { name: 'Asha Rao', phoneNumber: '+919876543210', countryCode: 'IN' },
-];
-```
+Full API reference, inputs, outputs, templates, theme tokens, styling, CSP, accessibility, and more:
 
-Alphabetic search text is emitted through `suggestionSearch` but is not written to the form control. Selecting a suggestion writes its phone value.
-
-## Clear behavior
-
-The clear button resets the phone value and emits `null`. By default it preserves the selected country so users can retype another number for the same region. Set `[resetCountryOnClear]="true"` or configure `resetCountryOnClear: true` globally to restore the configured `defaultCountry` when clearing.
-
-## Values and validation
-
-The default `outputFormat="string"` emits a valid E.164 value such as `+919876543210`. While an incomplete number is being edited, the current display value is emitted. Set `outputFormat="object"` for:
-
-```ts
-interface PhoneNumberValue {
-  number: string;
-  internationalNumber: string;
-  nationalNumber: string;
-  e164Number: string;
-  countryCode: string;
-  dialCode: string;
-}
-```
-
-Invalid non-empty values produce `{ invalidPhoneNumber: { invalid: true, reason: 'TOO_SHORT' | 'TOO_LONG' | 'INVALID_COUNTRY_CODE' | 'INVALID_LENGTH' } }`. Set `[validationEnabled]="false"` to disable the library validator, or set `validationMessage` to customize the screen-reader-only error text.
-
-For typed forms, use `FormControl<PhoneInputValue>` when the control may emit strings, objects, or `null`. If your app fixes `outputFormat="string"`, `FormControl<string | null>` is also appropriate; with `outputFormat="object"`, use `FormControl<PhoneNumberValue | null>`.
-
-The `required` input only forwards the native `required` attribute. Use Angular `Validators.required` in reactive forms or the Angular `required` validator in template-driven forms when the form control itself must be invalid while empty.
-
-## Inputs, outputs, and types
-
-Every component input, output event, interface, template context, and service method is documented in the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md).
-
-## Styling
-
-Use the class/style inputs to customize the built-in UI while keeping the component behavior and accessibility intact.
-
-```html
-<ng-tel-input-autocomplete
-  containerClass="rounded-phone"
-  [containerStyle]="{ borderColor: '#18181b' }"
-  inputClass="phone-text"
-  [dropdownStyle]="{ maxHeight: '18rem' }"
-/>
-```
-
-## Theme tokens
-
-The component exposes CSS custom properties on the host. Override them globally through `ng-tel-input-autocomplete { ... }`, or locally through wrapper selectors. See the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md#theme-tokens) for the full token list.
-
-```css
-ng-tel-input-autocomplete.enterprise-phone {
-  --ngti-color-primary: #0f766e;
-  --ngti-color-primary-strong: #115e59;
-  --ngti-size-input-height: 2.5rem;
-  --ngti-radius-sm: 0.25rem;
-}
-```
-
-## Country API
-
-Call `provideHttpClient()` in the application when `countrySearchUrl` is used:
-
-```ts
-import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient, withFetch } from '@angular/common/http';
-
-export const appConfig: ApplicationConfig = {
-  providers: [provideHttpClient(withFetch())],
-};
-```
-
-The endpoint receives `q`, `page`, and `limit` query parameters and must return:
-
-```json
-{
-  "data": [
-    {
-      "name": "India",
-      "code": "IN",
-      "dialCode": "+91",
-      "flag": "🇮🇳",
-      "format": "",
-      "placeholder": "98765 43210"
-    }
-  ],
-  "meta": { "page": 1, "limit": 15, "total": 1, "hasMore": false }
-}
-```
-
-During server rendering, the local country dataset is used to keep rendering deterministic.
-
-## Image flags
-
-Emoji flags avoid network requests and work with strict Content Security Policies. To use images:
-
-```html
-<ng-tel-input-autocomplete flagMode="image" [flagUrl]="flagUrl" />
-```
-
-```ts
-readonly flagUrl = (code: string) => `/assets/flags/${code.toLowerCase()}.svg`;
-```
-
-## Dial-code detection and paste normalization
-
-International values such as `+12025550143`, `00919876543210`, and `tel:+44-20-7946-0958` are normalized before parsing. By default, typing or pasting a recognized international dial code switches the selected country automatically. Set `[autoSelectCountryOnDialCode]="false"` to keep the current country selected and show the detected-country prompt instead.
-
-## Content Security Policy (CSP)
-
-The library is designed to be fully compatible with strict Content Security Policies (CSP):
-
-- **No eval or dynamic compilation**: The library does not use `eval()`, `new Function()`, or any other dynamic script execution mechanisms. It functions perfectly with a strict `script-src 'self'` policy (no `'unsafe-eval'` required).
-- **Network-free by default**: The default `flagMode="emoji"` relies purely on Unicode emojis, avoiding any external image requests. This works out-of-the-box with a strict `img-src 'self'` policy.
-  - If you switch to `flagMode="image"` and use the default fallback, you must add `https://flagcdn.com` to your `img-src` policy.
-- **Strict Style Policies (Style Nonces)**: To comply with a strict `style-src` policy (without `'unsafe-inline'`), you must supply Angular with a nonce. The library's component styles will automatically receive this nonce.
-
-### Configuring style nonces
-
-You can pass the CSP nonce to Angular in one of two ways:
-
-1. **Using the `ngCspNonce` attribute** on the root application element (suitable for server-rendered pages):
-
-   ```html
-   <app-root ngCspNonce="YOUR_RANDOM_NONCE"></app-root>
-   ```
-
-2. **Providing the `CSP_NONCE` injection token** during application bootstrap (suitable for client-rendered applications):
-
-   ```ts
-   import { bootstrapApplication, CSP_NONCE } from '@angular/core';
-   import { AppComponent } from './app/app.component';
-
-   bootstrapApplication(AppComponent, {
-     providers: [
-       {
-         provide: CSP_NONCE,
-         useValue: 'YOUR_RANDOM_NONCE',
-       },
-     ],
-   });
-   ```
-
-For static configurations, you can enable `autoCsp` in your `angular.json` configuration under build options:
-
-```json
-"security": {
-  "autoCsp": true
-}
-```
-
-## Accessibility checklist
-
-- Use a visible `<label for="...">` with `inputId`, or provide `ariaLabel` / `ariaLabelledBy`.
-- The input exposes combobox semantics with `aria-expanded`, `aria-controls`, `aria-activedescendant`, and `aria-invalid`.
-- Country and suggestion overlays render as listboxes with option rows.
-- `Escape`, `Tab`, `ArrowUp`, `ArrowDown`, and `Enter` are supported for keyboard users.
-- Invalid state is exposed through `aria-invalid` and a screen-reader-only error message.
-- Custom templates should not include nested buttons, links, or form controls inside option rows.
-
-## Development and publishing
-
-```bash
-npm run test:lib
-npm run build:lib
-npm run verify:lib
-```
-
-The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the built npm artifact. `verify:lib` tests the library, builds the production package and demo against `dist`, and performs an npm package dry run. Publishing should be performed from `dist/ng-tel-input-autocomplete` through the release workflow.
+- 📖 [GitBook Documentation](https://subhrangsu.gitbook.io/ng-tel-input-autocomplete)
+- 📋 [API Reference on GitHub](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md)
 
 ## Links
 
+- Demo: [Live Playground](https://my-workspace-chi-eight.vercel.app)
 - Repository: [Subhrangsu90/tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete)
-- Library source: [projects/ng-tel-input-autocomplete](https://github.com/Subhrangsu90/tel-input-autocomplete/tree/master/projects/ng-tel-input-autocomplete)
-- npm package: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
+- npm: [ng-tel-input-autocomplete](https://www.npmjs.com/package/ng-tel-input-autocomplete)
 
 ## License
 

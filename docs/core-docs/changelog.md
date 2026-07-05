@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.2 - 2026-07-06
+
+- **Overlay Auto-Resizing and Positioning**: Fixed an issue where the country list and contact suggestions dropdown overlays did not dynamically resize or realign when the screen/viewport resized. Added a `window:resize` host listener to programmatically update the size of the active overlay to match its parent container element and trigger positioning updates.
+
 ## 1.0.1 - 2026-07-04
 
 - **Content Security Policy (CSP)**: Certified compatibility with strict CSP environments (no dynamic execution like `eval()`) and added detailed guides for configuring style nonces using the `CSP_NONCE` injection token or `ngCspNonce` root attribute.

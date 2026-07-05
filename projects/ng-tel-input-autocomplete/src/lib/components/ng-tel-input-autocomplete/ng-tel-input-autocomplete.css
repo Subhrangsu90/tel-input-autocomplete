@@ -1,20 +1,8 @@
-@font-face {
-  font-family: 'Twemoji Country Flags';
-  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
-  src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1/dist/TwemojiCountryFlags.woff2') format('woff2');
-}
-
 :host {
   display: block;
   width: 100%;
   color: var(--ngti-color-text);
   font-family: inherit;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
 }
 
 .ngti-input-shell {
@@ -41,36 +29,7 @@
   outline-color: color-mix(in srgb, var(--ngti-color-primary) 34%, transparent);
 }
 
-.ngti-input-shell.ngti-is-invalid {
-  border-color: var(--ngti-color-danger-border);
-  outline-color: color-mix(in srgb, var(--ngti-color-danger) 26%, transparent);
-}
-
-.ngti-input-shell.ngti-is-invalid.ngti-is-focused {
-  border-color: var(--ngti-color-danger);
-  outline-color: color-mix(in srgb, var(--ngti-color-danger) 38%, transparent);
-}
-
-.ngti-input-shell.ngti-is-invalid .ngti-country-trigger {
-  border-inline-end-color: color-mix(
-    in srgb,
-    var(--ngti-color-danger-border) 70%,
-    var(--ngti-color-border)
-  );
-}
-
-.ngti-input-shell.ngti-is-invalid .ngti-country-trigger:focus-visible,
-.ngti-input-shell.ngti-is-invalid .ngti-clear-button:focus-visible {
-  outline-color: var(--ngti-color-danger);
-}
-
-.ngti-input-shell.ngti-is-invalid .ngti-phone-input {
-  caret-color: var(--ngti-color-danger);
-}
-:host(.ng-pending) .ngti-input-shell {
-  border-color: var(--ngti-color-primary-border);
-}
-
+.ngti-input-shell.ngti-is-invalid,
 :host(.ng-invalid.ng-touched) .ngti-input-shell,
 :host(.ng-invalid.ng-dirty) .ngti-input-shell,
 :host-context(.ng-submitted):host(.ng-invalid) .ngti-input-shell {
@@ -78,6 +37,7 @@
   outline-color: color-mix(in srgb, var(--ngti-color-danger) 26%, transparent);
 }
 
+.ngti-input-shell.ngti-is-invalid.ngti-is-focused,
 :host(.ng-invalid.ng-touched) .ngti-input-shell.ngti-is-focused,
 :host(.ng-invalid.ng-dirty) .ngti-input-shell.ngti-is-focused,
 :host-context(.ng-submitted):host(.ng-invalid) .ngti-input-shell.ngti-is-focused {
@@ -85,6 +45,7 @@
   outline-color: color-mix(in srgb, var(--ngti-color-danger) 38%, transparent);
 }
 
+.ngti-input-shell.ngti-is-invalid .ngti-country-trigger,
 :host(.ng-invalid.ng-touched) .ngti-country-trigger,
 :host(.ng-invalid.ng-dirty) .ngti-country-trigger,
 :host-context(.ng-submitted):host(.ng-invalid) .ngti-country-trigger {
@@ -95,6 +56,8 @@
   );
 }
 
+.ngti-input-shell.ngti-is-invalid .ngti-country-trigger:focus-visible,
+.ngti-input-shell.ngti-is-invalid .ngti-clear-button:focus-visible,
 :host(.ng-invalid.ng-touched) .ngti-country-trigger:focus-visible,
 :host(.ng-invalid.ng-touched) .ngti-clear-button:focus-visible,
 :host(.ng-invalid.ng-dirty) .ngti-country-trigger:focus-visible,
@@ -104,11 +67,17 @@
   outline-color: var(--ngti-color-danger);
 }
 
+.ngti-input-shell.ngti-is-invalid .ngti-phone-input,
 :host(.ng-invalid.ng-touched) .ngti-phone-input,
 :host(.ng-invalid.ng-dirty) .ngti-phone-input,
 :host-context(.ng-submitted):host(.ng-invalid) .ngti-phone-input {
   caret-color: var(--ngti-color-danger);
 }
+
+:host(.ng-pending) .ngti-input-shell {
+  border-color: var(--ngti-color-primary-border);
+}
+
 
 .ngti-input-shell.ngti-is-disabled {
   border-color: var(--ngti-color-border);
@@ -133,12 +102,10 @@
 
 .ngti-input-shell.ngti-size-small {
   min-height: var(--ngti-size-input-height-sm);
-  border-radius: var(--ngti-radius-sm);
 }
 
 .ngti-input-shell.ngti-size-large {
   min-height: var(--ngti-size-input-height-lg);
-  border-radius: var(--ngti-radius-sm);
 }
 
 .ngti-size-small .ngti-country-trigger {
@@ -193,30 +160,6 @@
 .ngti-switch-button:focus-visible {
   outline: 1px solid var(--ngti-color-primary);
   outline-offset: -1px;
-}
-
-.ngti-flag-emoji {
-  width: var(--ngti-size-flag-width);
-  flex: none;
-  font-size: 1.2rem;
-  line-height: 1;
-  text-align: center;
-  font-family: 'Twemoji Country Flags', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', 'Android Emoji', 'EmojiSymbols', sans-serif;
-}
-
-.ngti-flag-image {
-  width: var(--ngti-size-flag-width);
-  height: var(--ngti-size-flag-height);
-  flex: none;
-  border: 1px solid var(--ngti-color-border);
-  border-radius: var(--ngti-radius-xs);
-  object-fit: cover;
-  box-shadow: 0 1px 1px rgb(15 23 42 / 0.04);
-}
-
-.ngti-flag-image.ngti-size-small {
-  width: 1.25rem;
-  height: 0.85rem;
 }
 
 .ngti-dial-code {

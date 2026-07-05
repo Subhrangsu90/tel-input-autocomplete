@@ -1,6 +1,6 @@
 {
   "name": "ng-tel-input-autocomplete",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Accessible international telephone input and contact autocomplete for modern Angular applications.",
   "keywords": [
     "angular",
@@ -9,7 +9,10 @@
     "autocomplete",
     "international",
     "forms",
-    "accessibility"
+    "accessibility",
+    "intl-tel-input",
+    "phone number",
+    "validation"
   ],
   "author": "Subhrangsu Bera",
   "license": "MIT",
@@ -24,14 +27,29 @@
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
     "@angular/forms": "^21.0.0",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "google-libphonenumber": "^3.2.44",
+    "intl-tel-input": "^29.1.1"
+  },
+  "peerDependenciesMeta": {
+    "google-libphonenumber": {
+      "optional": true
+    },
+    "intl-tel-input": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "google-libphonenumber": "^3.2.44",
-    "intl-tel-input": "^29.1.1",
     "tslib": "^2.3.0"
   },
   "sideEffects": false,
+  "files": [
+    "fesm2022/**/*.mjs",
+    "types/**/*.d.ts",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "homepage": "https://subhrangsu.gitbook.io/ng-tel-input-autocomplete",
   "repository": {
      "type": "git",
@@ -45,3 +63,4 @@
      "url": "https://github.com/Subhrangsu90/tel-input-autocomplete/issues"
   }
 }
+
