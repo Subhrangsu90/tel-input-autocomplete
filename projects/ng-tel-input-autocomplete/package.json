@@ -19,7 +19,11 @@
     "google-libphonenumber",
     "tel-input"
   ],
-  "author": "Subhrangsu Bera",
+  "author": {
+    "name": "Subhrangsu Bera",
+    "email": "subhrangsubera@gmail.com",
+    "url": "https://github.com/Subhrangsu90"
+  },
   "license": "MIT",
   "engines": {
     "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
@@ -53,12 +57,14 @@
     "types/**/*.d.ts",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "homepage": "https://subhrangsu.gitbook.io/ng-tel-input-autocomplete",
   "repository": {
-     "type": "git",
-     "url": "git+https://github.com/Subhrangsu90/tel-input-autocomplete.git"
+    "type": "git",
+    "url": "git+https://github.com/Subhrangsu90/tel-input-autocomplete.git",
+    "directory": "projects/ng-tel-input-autocomplete"
   },
   "funding": {
      "type": "github",
