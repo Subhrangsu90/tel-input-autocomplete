@@ -23,7 +23,7 @@ Angular, Angular Forms, CDK, and RxJS are peer dependencies. The package install
 
 No Tailwind, global stylesheet, or external flag service is required. Styles are encapsulated in the components and emoji flags are the default.
 
-For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md).
+For the complete properties, emitters, templates, interfaces, keyboard behavior, and service methods, see the [API reference](api-reference.md).
 
 ## Quick start
 
@@ -39,11 +39,7 @@ import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomple
   imports: [ReactiveFormsModule, NgTelInputAutocomplete],
   template: `
     <label for="customer-phone">Phone</label>
-    <ng-tel-input-autocomplete
-      inputId="customer-phone"
-      [formControl]="phone"
-      defaultCountry="US"
-    />
+    <ng-tel-input-autocomplete inputId="customer-phone" [formControl]="phone" defaultCountry="US" />
   `,
 })
 export class PhoneField {
@@ -212,7 +208,7 @@ The `required` input only forwards the native `required` attribute. Use Angular 
 
 ## Inputs, outputs, and types
 
-Every component input, output event, interface, template context, and service method is documented in the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md).
+Every component input, output event, interface, template context, and service method is documented in the [API reference](api-reference.md).
 
 ## Styling
 
@@ -229,7 +225,7 @@ Use the class/style inputs to customize the built-in UI while keeping the compon
 
 ## Theme tokens
 
-The component exposes CSS custom properties on the host. Override them globally through `ng-tel-input-autocomplete { ... }`, or locally through wrapper selectors. See the [API reference](https://github.com/Subhrangsu90/tel-input-autocomplete/blob/master/projects/ng-tel-input-autocomplete/API.md#theme-tokens) for the full token list.
+The component exposes CSS custom properties on the host. Override them globally through `ng-tel-input-autocomplete { ... }`, or locally through wrapper selectors. See the [API reference](api-reference.md#theme-tokens) for the full token list.
 
 ```css
 ng-tel-input-autocomplete.enterprise-phone {
@@ -305,11 +301,13 @@ The library is designed to be fully compatible with strict Content Security Poli
 You can pass the CSP nonce to Angular in one of two ways:
 
 1. **Using the `ngCspNonce` attribute** on the root application element (suitable for server-rendered pages):
+
    ```html
    <app-root ngCspNonce="YOUR_RANDOM_NONCE"></app-root>
    ```
 
 2. **Providing the `CSP_NONCE` injection token** during application bootstrap (suitable for client-rendered applications):
+
    ```ts
    import { bootstrapApplication, CSP_NONCE } from '@angular/core';
    import { AppComponent } from './app/app.component';
@@ -325,6 +323,7 @@ You can pass the CSP nonce to Angular in one of two ways:
    ```
 
 For static configurations, you can enable `autoCsp` in your `angular.json` configuration under build options:
+
 ```json
 "security": {
   "autoCsp": true
@@ -359,4 +358,3 @@ The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the
 ## License
 
 MIT
-

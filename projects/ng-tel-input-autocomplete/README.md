@@ -4,6 +4,9 @@
 [![Angular](https://img.shields.io/badge/angular-21-dd0031.svg)](https://angular.dev/)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/ng-tel-input-autocomplete.svg)](https://bundlephobia.com/package/ng-tel-input-autocomplete)
+[![Documentation](https://img.shields.io/badge/docs-GitBook-blue)](https://subhrangsu.gitbook.io/ng-tel-input-autocomplete)
+
+Accessible international telephone input and contact autocomplete for Angular 21.
 
 Accessible international telephone input and contact autocomplete for Angular 21. The standalone component supports Reactive Forms, template-driven forms, country filtering, validation, formatting, keyboard navigation, asynchronous suggestions, RTL layouts, and optional paginated country APIs.
 
@@ -39,11 +42,7 @@ import { NgTelInputAutocomplete, PhoneInputValue } from 'ng-tel-input-autocomple
   imports: [ReactiveFormsModule, NgTelInputAutocomplete],
   template: `
     <label for="customer-phone">Phone</label>
-    <ng-tel-input-autocomplete
-      inputId="customer-phone"
-      [formControl]="phone"
-      defaultCountry="US"
-    />
+    <ng-tel-input-autocomplete inputId="customer-phone" [formControl]="phone" defaultCountry="US" />
   `,
 })
 export class PhoneField {
@@ -303,11 +302,13 @@ The library is designed to be fully compatible with strict Content Security Poli
 You can pass the CSP nonce to Angular in one of two ways:
 
 1. **Using the `ngCspNonce` attribute** on the root application element (suitable for server-rendered pages):
+
    ```html
    <app-root ngCspNonce="YOUR_RANDOM_NONCE"></app-root>
    ```
 
 2. **Providing the `CSP_NONCE` injection token** during application bootstrap (suitable for client-rendered applications):
+
    ```ts
    import { bootstrapApplication, CSP_NONCE } from '@angular/core';
    import { AppComponent } from './app/app.component';
@@ -323,6 +324,7 @@ You can pass the CSP nonce to Angular in one of two ways:
    ```
 
 For static configurations, you can enable `autoCsp` in your `angular.json` configuration under build options:
+
 ```json
 "security": {
   "autoCsp": true
@@ -357,4 +359,3 @@ The package includes `README.md`, `API.md`, `LICENSE`, and `CHANGELOG.md` in the
 ## License
 
 MIT
-
